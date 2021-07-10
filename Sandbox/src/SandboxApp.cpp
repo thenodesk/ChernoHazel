@@ -1,5 +1,4 @@
 #include <Hazel.h>
-#include <iostream>
 
 class Sandbox : public Hazel::Application
 {
