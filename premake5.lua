@@ -26,6 +26,7 @@ project "ChernoHazel"
 	
 	includedirs
 	{
+		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include"
 	}
 	
@@ -105,3 +106,4 @@ project "Sandbox"
 	filter "configurations:Dist"
 		defines "HZ_DIST"
 		optimize "On"
+		
