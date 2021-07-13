@@ -13,8 +13,10 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 -- Include directories relative to root folder (solution directory)
 IncludeDir = {}
 IncludeDir["GLFW"] = "ChernoHazel/vendor/GLFW/include"
+IncludeDir["Glad"] = "ChernoHazel/vendor/Glad/include"
 
 include "ChernoHazel/vendor/GLFW"
+include "ChernoHazel/vendor/Glad"
     
 project "ChernoHazel"
     location "ChernoHazel"
@@ -37,12 +39,14 @@ project "ChernoHazel"
     {
         "%{prj.name}/src",
         "%{prj.name}/vendor/spdlog/include",
-        "%{IncludeDir.GLFW}"
+        "%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glad}"
     }
     
     links
     {
         "GLFW",
+		"Glad",
         "opengl32.lib"
     }
     
@@ -54,7 +58,8 @@ project "ChernoHazel"
         defines
         {
             "HZ_PLATFORM_WINDOWS",
-            "HZ_BUILD_DLL"
+            "HZ_BUILD_DLL",
+			"GLFW_INCLUDE_NONE"
         }
     
         postbuildcommands
@@ -64,14 +69,17 @@ project "ChernoHazel"
         
     filter "configurations:Debug"
         defines "HZ_DEBUG"
+		buildoptions "/MDd"
         symbols "On"
         
     filter "configurations:Release"
         defines "HZ_RELEASE"
+		buildoptions "/MD"
         optimize "On"
         
     filter "configurations:Dist"
         defines "HZ_DIST"
+		buildoptions "/MD"
         optimize "On"
 
         
@@ -113,13 +121,17 @@ project "Sandbox"
         
     filter "configurations:Debug"
         defines "HZ_DEBUG"
+		-- SE DER MERDA MUDA PRA /MTd e /MT --
+		buildoptions "/MDd"
         symbols "On"
         
     filter "configurations:Release"
         defines "HZ_RELEASE"
+		buildoptions "/MD"
         optimize "On"
         
     filter "configurations:Dist"
         defines "HZ_DIST"
+		buildoptions "/MD"
         optimize "On"
         
