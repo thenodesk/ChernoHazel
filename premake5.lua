@@ -17,6 +17,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "ChernoHazel/vendor/GLFW/include"
 IncludeDir["Glad"] = "ChernoHazel/vendor/Glad/include"
 IncludeDir["ImGui"] = "ChernoHazel/vendor/imgui"
+IncludeDir["glm"] = "ChernoHazel/vendor/glm"
 
 include "ChernoHazel/vendor/GLFW"
 include "ChernoHazel/vendor/Glad"
@@ -37,7 +38,9 @@ project "ChernoHazel"
     files
     {
         "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp"
+        "%{prj.name}/src/**.cpp",
+		"%{prj.name}/vendor/glm/glm/**.hpp",
+		"%{prj.name}/vendor/glm/glm/**.inl"
     }
     
     includedirs
@@ -46,7 +49,8 @@ project "ChernoHazel"
         "%{prj.name}/vendor/spdlog/include",
         "%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
-		"%{IncludeDir.ImGui}"
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.glm}"
     }
     
     links
@@ -107,7 +111,9 @@ project "Sandbox"
     includedirs
     {
         "ChernoHazel/vendor/spdlog/include",
-        "ChernoHazel/src"
+        "ChernoHazel/src",
+		"ChernoHazel/vendor",
+		"%{IncludeDir.glm}"
     }
     
     links

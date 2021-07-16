@@ -7,3 +7,6 @@
 [submodule "ChernoHazel/vendor/imgui"]
 	path = ChernoHazel/vendor/imgui
 	url = https://github.com/TheCherno/imgui
+[submodule "ChernoHazel/vendor/glm"]
+	path = ChernoHazel/vendor/glm
+	url = https://github.com/g-truc/glm
