@@ -19,9 +19,12 @@ IncludeDir["Glad"] = "ChernoHazel/vendor/Glad/include"
 IncludeDir["ImGui"] = "ChernoHazel/vendor/imgui"
 IncludeDir["glm"] = "ChernoHazel/vendor/glm"
 
-include "ChernoHazel/vendor/GLFW"
-include "ChernoHazel/vendor/Glad"
-include "ChernoHazel/vendor/imgui"
+group "Dependencies"
+	include "ChernoHazel/vendor/GLFW"
+	include "ChernoHazel/vendor/Glad"
+	include "ChernoHazel/vendor/imgui"
+
+group ""
     
 project "ChernoHazel"
     location "ChernoHazel"
