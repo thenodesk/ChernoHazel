@@ -18,6 +18,7 @@ IncludeDir["GLFW"] = "ChernoHazel/vendor/GLFW/include"
 IncludeDir["Glad"] = "ChernoHazel/vendor/Glad/include"
 IncludeDir["ImGui"] = "ChernoHazel/vendor/imgui"
 IncludeDir["glm"] = "ChernoHazel/vendor/glm"
+IncludeDir["stb_image"] = "ChernoHazel/vendor/stb_image"
 
 group "Dependencies"
 	include "ChernoHazel/vendor/GLFW"
@@ -43,6 +44,8 @@ project "ChernoHazel"
     {
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp",
+		"%{prj.name}/vendor/stb_image/**.h",
+		"%{prj.name}/vendor/stb_image/**.cpp",
         "%{prj.name}/vendor/glm/glm/**.hpp",
         "%{prj.name}/vendor/glm/glm/**.inl"
     }
@@ -59,7 +62,8 @@ project "ChernoHazel"
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.Glad}",
         "%{IncludeDir.ImGui}",
-        "%{IncludeDir.glm}"
+        "%{IncludeDir.glm}",
+		"%{IncludeDir.stb_image}"
     }
     
     links
