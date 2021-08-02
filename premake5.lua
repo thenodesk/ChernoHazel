@@ -1,5 +1,6 @@
 workspace "ChernoHazel"
     architecture "x86_64"
+	startproject "Hazelnut"
     
     configurations
     {
@@ -7,8 +8,6 @@ workspace "ChernoHazel"
         "Release",
         "Dist"
     }
-
-startproject "Sandbox"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -148,8 +147,8 @@ project "Sandbox"
         optimize "on"
        
 	   
-project "Hazel-Editor"
-    location "Hazel-Editor"
+project "Hazelnut"
+    location "Hazelnut"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
