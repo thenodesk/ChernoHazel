@@ -18,6 +18,7 @@ IncludeDir["Glad"] = "ChernoHazel/vendor/Glad/include"
 IncludeDir["ImGui"] = "ChernoHazel/vendor/imgui"
 IncludeDir["glm"] = "ChernoHazel/vendor/glm"
 IncludeDir["stb_image"] = "ChernoHazel/vendor/stb_image"
+IncludeDir["entt"] = "ChernoHazel/vendor/entt/include"
 
 group "Dependencies"
 	include "ChernoHazel/vendor/GLFW"
@@ -62,7 +63,8 @@ project "ChernoHazel"
         "%{IncludeDir.Glad}",
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.glm}",
-		"%{IncludeDir.stb_image}"
+		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.entt}"
     }
     
     links
@@ -78,8 +80,6 @@ project "ChernoHazel"
         
         defines
         {
-            "HZ_PLATFORM_WINDOWS",
-            "HZ_BUILD_DLL",
             "GLFW_INCLUDE_NONE"
         }
         
@@ -168,7 +168,8 @@ project "Hazelnut"
         "ChernoHazel/vendor/spdlog/include",
         "ChernoHazel/src",
         "ChernoHazel/vendor",
-        "%{IncludeDir.glm}"
+        "%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
     }
     
     links
