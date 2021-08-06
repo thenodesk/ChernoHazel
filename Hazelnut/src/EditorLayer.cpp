@@ -62,6 +62,8 @@ namespace Hazel {
         };
 
         m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+
+        m_Panel.SetContext(m_ActiveScene);
     }
 
     void EditorLayer::OnDetach()
@@ -172,6 +174,8 @@ namespace Hazel {
 
             ImGui::EndMenuBar();
         }
+
+        m_Panel.OnImGuiRender();
 
         ImGui::Begin("Settings");
         auto stats = Renderer2D::GetStats();

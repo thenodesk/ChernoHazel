@@ -4,8 +4,7 @@ bin/
 bin-int/
 
 # Files
-**.sln
-**.vcxproj
-**.vcxproj.filters
-**.vcxproj.user
-generateProject.bat
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
