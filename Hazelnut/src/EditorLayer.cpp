@@ -1,5 +1,5 @@
 #include "EditorLayer.h"
-#include "imgui/imgui.h"
+#include <imgui/imgui.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -27,13 +27,13 @@ namespace Hazel {
         m_SquareEntity = m_ActiveScene->CreateEntity("Green Square");
         m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
-        auto redSquare = m_ActiveScene->CreateEntity("Red Square");
+        Entity redSquare = m_ActiveScene->CreateEntity("Red Square");
         redSquare.AddComponent<SpriteRendererComponent>(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 
-        m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
+        m_CameraEntity = m_ActiveScene->CreateEntity("Camera A");
         m_CameraEntity.AddComponent<CameraComponent>();
 
-        m_SecondCamera = m_ActiveScene->CreateEntity("Clip-Space Camera");
+        m_SecondCamera = m_ActiveScene->CreateEntity("Camera B");
         auto& cc = m_SecondCamera.AddComponent<CameraComponent>();
         cc.Primary = false;
 
@@ -50,17 +50,17 @@ namespace Hazel {
 
             void OnUpdate(Timestep ts)
             {
-                auto& transform = GetComponent<TransformComponent>().Transform;
+                auto& translation = GetComponent<TransformComponent>().Translation;
                 float speed = 5.0f;
 
                 if (Input::IsKeyPressed(KeyCode::A))
-                    transform[3][0] -= speed * ts;
+                    translation.x -= speed * ts;
                 if (Input::IsKeyPressed(KeyCode::D))
-                    transform[3][0] += speed * ts;
+                    translation.x += speed * ts;
                 if (Input::IsKeyPressed(KeyCode::W))
-                    transform[3][1] += speed * ts;
+                    translation.y += speed * ts;
                 if (Input::IsKeyPressed(KeyCode::S))
-                    transform[3][1] -= speed * ts;
+                    translation.y -= speed * ts;
             }
         };
 
@@ -180,39 +180,13 @@ namespace Hazel {
 
         m_Panel.OnImGuiRender();
 
-        ImGui::Begin("Settings");
+        ImGui::Begin("Stats");
         auto stats = Renderer2D::GetStats();
         ImGui::Text("Renderer2D Stats:");
         ImGui::Text("Draw Calls: %d", stats.DrawCalls);
         ImGui::Text("Quads: %d", stats.QuadCount);
         ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
-        ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
-        
-        if (m_SquareEntity)
-        {
-            ImGui::Separator();
-            ImGui::Text("%s", m_SquareEntity.GetComponent<TagComponent>().Tag.c_str());
-
-            auto& squareColor = m_SquareEntity.GetComponent<SpriteRendererComponent>().Color;
-            ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
-            ImGui::Separator();
-        }
-        
-        ImGui::DragFloat3("Camera Transform", glm::value_ptr(m_CameraEntity.GetComponent<TransformComponent>().Transform[3]));
-
-        if (ImGui::Checkbox("Camera A", &m_PrimaryCamera))
-        {
-            m_CameraEntity.GetComponent<CameraComponent>().Primary = m_PrimaryCamera;
-            m_SecondCamera.GetComponent<CameraComponent>().Primary = !m_PrimaryCamera;
-        }
-
-        {
-            auto& camera = m_SecondCamera.GetComponent<CameraComponent>().Camera;
-            float orthoSize = camera.GetOrthographicSize();
-            if (ImGui::DragFloat("Second Camera Ortho Size", &orthoSize))
-                camera.SetOrthographicSize(orthoSize);
-        }
-
+        ImGui::Text("Indices: %d", stats.GetTotalIndexCount()); 
         ImGui::End();
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
@@ -223,13 +197,7 @@ namespace Hazel {
         Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
 
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-        /*if (m_ViewportSize != *((glm::vec2*)&viewportPanelSize) && viewportPanelSize.x > 0 && viewportPanelSize.y > 0)
-        {
-            m_Framebuffer->Resize((uint32_t)viewportPanelSize.x, (uint32_t)viewportPanelSize.y);
-            m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
-            m_CameraController.OnResize(viewportPanelSize.x, viewportPanelSize.y);
-        }*/
         m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
         uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
         ImGui::Image((void*)textureID, ImVec2(m_ViewportSize.x, m_ViewportSize.y), { 0, 1 }, { 1, 0 });
