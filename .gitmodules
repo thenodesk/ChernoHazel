@@ -10,3 +10,6 @@
 [submodule "ChernoHazel/vendor/glm"]
 	path = ChernoHazel/vendor/glm
 	url = https://github.com/g-truc/glm
+[submodule "ChernoHazel/vendor/yaml-cpp"]
+	path = ChernoHazel/vendor/yaml-cpp
+	url = https://github.com/TheCherno/yaml-cpp
