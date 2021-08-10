@@ -19,11 +19,13 @@ IncludeDir["ImGui"] = "ChernoHazel/vendor/imgui"
 IncludeDir["glm"] = "ChernoHazel/vendor/glm"
 IncludeDir["stb_image"] = "ChernoHazel/vendor/stb_image"
 IncludeDir["entt"] = "ChernoHazel/vendor/entt/include"
+IncludeDir["yaml_cpp"] = "ChernoHazel/vendor/yaml-cpp/include"
 
 group "Dependencies"
 	include "ChernoHazel/vendor/GLFW"
 	include "ChernoHazel/vendor/Glad"
 	include "ChernoHazel/vendor/imgui"
+	include "ChernoHazel/vendor/yaml-cpp"
 
 group ""
     
@@ -64,7 +66,8 @@ project "ChernoHazel"
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.yaml_cpp}"
     }
     
     links
@@ -72,6 +75,7 @@ project "ChernoHazel"
         "GLFW",
         "Glad",
         "ImGui",
+		"yaml-cpp",
         "opengl32.lib"
     }
     
