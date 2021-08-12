@@ -20,6 +20,7 @@ IncludeDir["glm"] = "ChernoHazel/vendor/glm"
 IncludeDir["stb_image"] = "ChernoHazel/vendor/stb_image"
 IncludeDir["entt"] = "ChernoHazel/vendor/entt/include"
 IncludeDir["yaml_cpp"] = "ChernoHazel/vendor/yaml-cpp/include"
+IncludeDir["ImGuizmo"] = "ChernoHazel/vendor/ImGuizmo"
 
 group "Dependencies"
 	include "ChernoHazel/vendor/GLFW"
@@ -49,7 +50,9 @@ project "ChernoHazel"
 		"%{prj.name}/vendor/stb_image/**.h",
 		"%{prj.name}/vendor/stb_image/**.cpp",
         "%{prj.name}/vendor/glm/glm/**.hpp",
-        "%{prj.name}/vendor/glm/glm/**.inl"
+        "%{prj.name}/vendor/glm/glm/**.inl",
+		"%{prj.name}/vendor/ImGuizmo/ImGuizmo.h",
+		"%{prj.name}/vendor/ImGuizmo/ImGuizmo.cpp"
     }
 	
 	defines
@@ -67,7 +70,8 @@ project "ChernoHazel"
         "%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.yaml_cpp}"
+		"%{IncludeDir.yaml_cpp}",
+		"%{IncludeDir.ImGuizmo}"
     }
     
     links
@@ -78,6 +82,9 @@ project "ChernoHazel"
 		"yaml-cpp",
         "opengl32.lib"
     }
+	
+	filter "files:ChernoHazel/vendor/ImGuizmo/**.cpp"
+		flags { "NoPCH" }
     
     filter "system:windows"
         systemversion "latest"
@@ -173,7 +180,8 @@ project "Hazelnut"
         "ChernoHazel/src",
         "ChernoHazel/vendor",
         "%{IncludeDir.glm}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.ImGuizmo}"
     }
     
     links

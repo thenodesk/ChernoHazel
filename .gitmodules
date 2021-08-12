@@ -13,3 +13,6 @@
 [submodule "ChernoHazel/vendor/yaml-cpp"]
 	path = ChernoHazel/vendor/yaml-cpp
 	url = https://github.com/TheCherno/yaml-cpp
+[submodule "ChernoHazel/vendor/ImGuizmo"]
+	path = ChernoHazel/vendor/ImGuizmo
+	url = https://github.com/TheCherno/ImGuizmo
