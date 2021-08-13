@@ -6,6 +6,8 @@
 #include "Texture.h"
 #include "SubTexture2D.h"
 
+#include "Hazel/Renderer/EditorCamera.h"
+
 namespace Hazel {
 
 	class Renderer2D
@@ -15,6 +17,7 @@ namespace Hazel {
 		static void Shutdown();
 
 		static void BeginScene(const Camera& camera, glm::mat4& transform);
+		static void BeginScene(const EditorCamera& camera);
 		static void BeginScene(const OrthographicCamera& camera); // TODO: remove
 		static void EndScene();
 		static void Flush();
