@@ -26,6 +26,7 @@ namespace Hazel {
         m_CheckerboardTexture = Texture2D::Create("assets/textures/Checkerboard.png");
 
         FramebufferSpecification fbSpec;
+        fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::Depth };
         fbSpec.Width = 1152;
         fbSpec.Height = 648;
         m_Framebuffer = Framebuffer::Create(fbSpec);
@@ -230,7 +231,7 @@ namespace Hazel {
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 
         m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-        uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+        uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID(1);
         ImGui::Image((void*)textureID, ImVec2(m_ViewportSize.x, m_ViewportSize.y), { 0, 1 }, { 1, 0 });
 
         // Guizmos
