@@ -133,7 +133,7 @@ namespace Hazel {
         int mouseX = (int)mx;
         int mouseY = (int)my;
 
-        if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
+        if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y && !m_GizmoManipulation)
         {
             int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
             m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
@@ -248,7 +248,11 @@ namespace Hazel {
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::Begin("Viewport");
-        ImVec2 viewportOffset = ImGui::GetCursorPos();
+        ImVec2 viewportOffset = ImGui::GetWindowPos();
+        ImVec2 viewportMinRegion = ImGui::GetWindowContentRegionMin();
+        ImVec2 viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+        m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+        m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
         m_ViewportFocused = ImGui::IsWindowFocused();
         m_ViewportHovered = ImGui::IsWindowHovered();
@@ -260,24 +264,15 @@ namespace Hazel {
         uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
         ImGui::Image((void*)textureID, ImVec2(m_ViewportSize.x, m_ViewportSize.y), { 0, 1 }, { 1, 0 });
 
-        ImVec2 windowSize = ImGui::GetWindowSize();
-        ImVec2 minBound = ImGui::GetWindowPos();
-        minBound.x += viewportOffset.x;
-        minBound.y += viewportOffset.y;
-
-        ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
-        m_ViewportBounds[0] = { minBound.x, minBound.y };
-        m_ViewportBounds[1] = { maxBound.x, maxBound.y };
-
         // Guizmos
         Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
         if (selectedEntity && m_GizmoType != -1)
         {
             ImGuizmo::SetOrthographic(false);
             ImGuizmo::SetDrawlist();
-            float windowWidth = (float)ImGui::GetWindowWidth();
-            float windowHeight= (float)ImGui::GetWindowHeight();
-            ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+            ImGuizmo::SetRect(m_ViewportBounds[0].x, m_ViewportBounds[0].y, 
+                m_ViewportBounds[1].x - m_ViewportBounds[0].x, m_ViewportBounds[1].y - m_ViewportBounds[0].y);
+
 
             // Camera
 
@@ -306,9 +301,11 @@ namespace Hazel {
 
             float snapValues[3] = { snapValue, snapValue , snapValue };
 
-            if (ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection), 
-                (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform), 
-                nullptr, snap ? snapValues : nullptr))
+            ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+                (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
+                nullptr, snap ? snapValues : nullptr);
+
+            if (ImGuizmo::IsUsing())
             {
                 m_GizmoManipulation = true;
 
@@ -338,6 +335,7 @@ namespace Hazel {
 
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<KeyPressedEvent>(HZ_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+        dispatcher.Dispatch<MouseButtonPressedEvent>(HZ_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
     }
 
     bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
@@ -400,6 +398,16 @@ namespace Hazel {
         
         }
 
+        return false;
+    }
+
+    bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e)
+    {
+        if (e.GetMouseButton() == Mouse::ButtonLeft)
+        {
+            if (m_ViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyPressed(Key::LeftAlt))
+                m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
+        }
         return false;
     }
 
