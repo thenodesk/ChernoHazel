@@ -13,20 +13,22 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 -- Include directories relative to root folder (solution directory)
 IncludeDir = {}
-IncludeDir["GLFW"] = "ChernoHazel/vendor/GLFW/include"
-IncludeDir["Glad"] = "ChernoHazel/vendor/Glad/include"
-IncludeDir["ImGui"] = "ChernoHazel/vendor/imgui"
-IncludeDir["glm"] = "ChernoHazel/vendor/glm"
-IncludeDir["stb_image"] = "ChernoHazel/vendor/stb_image"
-IncludeDir["entt"] = "ChernoHazel/vendor/entt/include"
-IncludeDir["yaml_cpp"] = "ChernoHazel/vendor/yaml-cpp/include"
-IncludeDir["ImGuizmo"] = "ChernoHazel/vendor/ImGuizmo"
+IncludeDir["GLFW"]      = "%{wks.location}/ChernoHazel/vendor/GLFW/include"
+IncludeDir["Glad"]      = "%{wks.location}/ChernoHazel/vendor/Glad/include"
+IncludeDir["ImGui"]     = "%{wks.location}/ChernoHazel/vendor/imgui"
+IncludeDir["glm"]       = "%{wks.location}/ChernoHazel/vendor/glm"
+IncludeDir["stb_image"] = "%{wks.location}/ChernoHazel/vendor/stb_image"
+IncludeDir["entt"]      = "%{wks.location}/ChernoHazel/vendor/entt/include"
+IncludeDir["yaml_cpp"]  = "%{wks.location}/ChernoHazel/vendor/yaml-cpp/include"
+IncludeDir["ImGuizmo"]  = "%{wks.location}/ChernoHazel/vendor/ImGuizmo"
+IncludeDir["Box2D"]     = "%{wks.location}/ChernoHazel/vendor/Box2D/include"
 
 group "Dependencies"
 	include "ChernoHazel/vendor/GLFW"
 	include "ChernoHazel/vendor/Glad"
 	include "ChernoHazel/vendor/imgui"
 	include "ChernoHazel/vendor/yaml-cpp"
+	include "ChernoHazel/vendor/Box2D"
 
 group ""
     
@@ -71,7 +73,8 @@ project "ChernoHazel"
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.yaml_cpp}",
-		"%{IncludeDir.ImGuizmo}"
+		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.Box2D}"
     }
     
     links
@@ -80,6 +83,7 @@ project "ChernoHazel"
         "Glad",
         "ImGui",
 		"yaml-cpp",
+		"Box2D",
         "opengl32.lib"
     }
 	

@@ -16,3 +16,6 @@
 [submodule "ChernoHazel/vendor/ImGuizmo"]
 	path = ChernoHazel/vendor/ImGuizmo
 	url = https://github.com/TheCherno/ImGuizmo
+[submodule "ChernoHazel/vendor/Box2D"]
+	path = ChernoHazel/vendor/Box2D
+	url = https://github.com/TheCherno/box2d
