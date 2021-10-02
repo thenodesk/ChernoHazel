@@ -17,13 +17,13 @@
 
 namespace Hazel {
 
-	static b2BodyType RigidBody2DTypeToBox2D(RigidBody2DComponent::BodyType bodyType)
+	static b2BodyType RigidBody2DTypeToBox2D(Rigidbody2DComponent::BodyType bodyType)
 	{
 		switch (bodyType)
 		{
-			case RigidBody2DComponent::BodyType::Static:    return b2_staticBody;
-			case RigidBody2DComponent::BodyType::Dynamic:   return b2_dynamicBody;
-			case RigidBody2DComponent::BodyType::Kinematic: return b2_kinematicBody;
+			case Rigidbody2DComponent::BodyType::Static:    return b2_staticBody;
+			case Rigidbody2DComponent::BodyType::Dynamic:   return b2_dynamicBody;
+			case Rigidbody2DComponent::BodyType::Kinematic: return b2_kinematicBody;
 		}
 
 		HZ_CORE_ASSERT(false, "Unknown body type!");
@@ -37,6 +37,59 @@ namespace Hazel {
 
 	Scene::~Scene()
 	{
+	}
+
+	template<typename Component>
+	static void CopyComponent(entt::registry& dst, const entt::registry& src, const std::unordered_map<UUID, entt::entity> enttMap)
+	{
+		auto view = src.view<Component>();
+		for (auto e : view)
+		{
+			UUID uuid = src.get<IDComponent>(e).ID;
+			HZ_CORE_ASSERT(enttMap.find(uuid) != enttMap.end(), "enttMap don't have this uuid!");
+			entt::entity dstEnttID = enttMap.at(uuid);
+
+			auto& component = src.get<Component>(e);
+			dst.emplace_or_replace<Component>(dstEnttID, component);
+		}
+	}
+
+	template<typename Component>
+	static void CopyComponentIfExists(Entity dst,Entity src)
+	{
+		if (src.HasComponent<Component>())
+			dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
+	}
+
+	Ref<Scene> Scene::Copy(Ref<Scene> other)
+	{
+		Ref<Scene> newScene = CreateRef<Scene>();
+		newScene->m_ViewportWidth  = other->m_ViewportWidth;
+		newScene->m_ViewportHeight = other->m_ViewportHeight;
+
+		std::unordered_map<UUID, entt::entity> enttMap;
+
+		// Create entities for the scene to copy
+		auto& srcSceneRegistry = other->m_Registry;
+		auto& dstSceneRegistry = newScene->m_Registry;
+		auto idView = srcSceneRegistry.view<IDComponent>();
+		for (auto e : idView)
+		{
+			UUID uuid = srcSceneRegistry.get<IDComponent>(e).ID;
+			const auto& name = srcSceneRegistry.get<TagComponent>(e).Tag;
+			Entity newEntity = newScene->CreateEntityWithUUID(uuid, name);
+			enttMap[uuid] = (entt::entity)newEntity;
+		}
+
+		// Copy components (except IDComponent and TagComponent)
+		CopyComponent<TransformComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<SpriteRendererComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<CameraComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<NativeScriptComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<Rigidbody2DComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<BoxCollider2DComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+
+		return newScene;
 	}
 
 	Entity Scene::CreateEntity(const std::string& name)
@@ -62,12 +115,12 @@ namespace Hazel {
 	void Scene::OnRuntimeStart()
 	{
 		m_PhysicsWorld = new b2World({ 0.0f, -9.8f });
-		auto view = m_Registry.view<RigidBody2DComponent>();
+		auto view = m_Registry.view<Rigidbody2DComponent>();
 		for (auto e : view)
 		{
 			Entity entity = { e, this };
 			auto& transform = entity.GetComponent<TransformComponent>();
-			auto& rb2d = entity.GetComponent<RigidBody2DComponent>();
+			auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
 
 			b2BodyDef bodyDef;
 			bodyDef.type = RigidBody2DTypeToBox2D(rb2d.Type);
@@ -143,12 +196,12 @@ namespace Hazel {
 			m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
 
 			// Retrieve transform from Box2D
-			auto view = m_Registry.view<RigidBody2DComponent>();
+			auto view = m_Registry.view<Rigidbody2DComponent>();
 			for (auto e : view)
 			{
 				Entity entity = { e, this };
 				auto& transform = entity.GetComponent<TransformComponent>();
-				auto& rb2d = entity.GetComponent<RigidBody2DComponent>();
+				auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
 
 				b2Body* body = (b2Body*)rb2d.RuntimeBody;
 				const auto& position = body->GetPosition();
@@ -209,6 +262,18 @@ namespace Hazel {
 		}
 	}
 
+	void Scene::DuplicateEntity(Entity entity)
+	{
+		Entity newEntity = CreateEntity(entity.GetName());
+
+		CopyComponentIfExists<TransformComponent>(newEntity, entity);
+		CopyComponentIfExists<SpriteRendererComponent>(newEntity, entity);
+		CopyComponentIfExists<CameraComponent>(newEntity, entity);
+		CopyComponentIfExists<NativeScriptComponent>(newEntity, entity);
+		CopyComponentIfExists<Rigidbody2DComponent>(newEntity, entity);
+		CopyComponentIfExists<BoxCollider2DComponent>(newEntity, entity);
+	}
+
 	Entity Scene::GetPrimaryCameraEntity()
 	{
 		auto view = m_Registry.view<CameraComponent>();
@@ -259,7 +324,7 @@ namespace Hazel {
 	}
 
 	template<>
-	void Scene::OnComponentAdded<RigidBody2DComponent>(Entity entity, RigidBody2DComponent& component)
+	void Scene::OnComponentAdded<Rigidbody2DComponent>(Entity entity, Rigidbody2DComponent& component)
 	{
 	}
 

@@ -245,11 +245,11 @@ namespace Hazel {
 				}
 			}
 
-			if (!m_SelectionContext.HasComponent<RigidBody2DComponent>())
+			if (!m_SelectionContext.HasComponent<Rigidbody2DComponent>())
 			{
 				if (ImGui::MenuItem("Rigidbody 2D"))
 				{
-					m_SelectionContext.AddComponent<RigidBody2DComponent>();
+					m_SelectionContext.AddComponent<Rigidbody2DComponent>();
 					ImGui::CloseCurrentPopup();
 				}
 			}
@@ -356,7 +356,7 @@ namespace Hazel {
 			ImGui::DragFloat("TilingFactor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
 		});
 
-		DrawComponent<RigidBody2DComponent>("Rigidbody 2D", entity, [](RigidBody2DComponent& component)
+		DrawComponent<Rigidbody2DComponent>("Rigidbody 2D", entity, [](Rigidbody2DComponent& component)
 		{
 			const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic"};
 			const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
@@ -369,7 +369,7 @@ namespace Hazel {
 					if (ImGui::Selectable(bodyTypeStrings[i], isSelected))
 					{
 						currentBodyTypeString = bodyTypeStrings[i];
-						component.Type = (RigidBody2DComponent::BodyType)i;
+						component.Type = (Rigidbody2DComponent::BodyType)i;
 					}
 
 					if (isSelected)
