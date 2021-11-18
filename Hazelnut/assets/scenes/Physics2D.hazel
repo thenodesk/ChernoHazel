@@ -1,16 +1,27 @@
 Scene: Untitled
 Entities:
-  - Entity: 2758272792187744069
+  - Entity: 5279668668430222997
     TagComponent:
-      Tag: Quad
+      Tag: Circle
     TransformComponent:
-      Translation: [0, 1.66653037, 0]
-      Rotation: [0, 0, -0.643178403]
-      Scale: [0.999999881, 0.999999881, 1]
+      Translation: [0.895444155, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CircleRendererComponent:
+      Color: [1, 1, 1, 1]
+      Thickness: 0.349999994
+      Fade: 0.00499999989
+  - Entity: 7553699789808268671
+    TagComponent:
+      Tag: Floor
+    TransformComponent:
+      Translation: [0, -4, 0]
+      Rotation: [0, 0, 0]
+      Scale: [15.0000057, 1, 1]
     SpriteRendererComponent:
-      Color: [1, 0.305309713, 0.305309713, 1]
+      Color: [0.818584085, 0.341242224, 0.0253543612, 1]
     RigidBody2DComponent:
-      BodyType: Dynamic
+      BodyType: Static
       FixedRotation: false
     BoxCollider2DComponent:
       Offset: [0, 0]
@@ -37,17 +48,17 @@ Entities:
         OrthographicFar: 1
       Primary: true
       FixedAspectRatio: false
-  - Entity: 7553699789808268671
+  - Entity: 2758272792187744069
     TagComponent:
-      Tag: Floor
+      Tag: Quad
     TransformComponent:
-      Translation: [0, -4, 0]
-      Rotation: [0, 0, 0]
-      Scale: [15.0000057, 1, 1]
+      Translation: [0, 1.66653037, 0]
+      Rotation: [0, 0, -0.643178403]
+      Scale: [0.999999881, 0.999999881, 1]
     SpriteRendererComponent:
-      Color: [0.818584085, 0.341242224, 0.0253543612, 1]
+      Color: [1, 0.305309713, 0.305309713, 1]
     RigidBody2DComponent:
-      BodyType: Static
+      BodyType: Dynamic
       FixedRotation: false
     BoxCollider2DComponent:
       Offset: [0, 0]

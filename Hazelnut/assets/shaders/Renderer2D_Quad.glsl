@@ -1,4 +1,4 @@
-// Texture Shader
+// Renderer2D Quad Shader
 
 #type vertex
 #version 450 core
