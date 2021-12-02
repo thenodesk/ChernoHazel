@@ -241,6 +241,22 @@ namespace Hazel {
 			out << YAML::EndMap; // BoxCollider2DComponent
 		}
 
+		if (entity.HasComponent<CircleCollider2DComponent>())
+		{
+			out << YAML::Key << "CircleCollider2DComponent";
+			out << YAML::BeginMap; // CircleCollider2DComponent
+
+			auto& cc2dComponent = entity.GetComponent<CircleCollider2DComponent>();
+			out << YAML::Key << "Offset" << YAML::Value << cc2dComponent.Offset;
+			out << YAML::Key << "Radius" << YAML::Value << cc2dComponent.Radius;
+			out << YAML::Key << "Density" << YAML::Value << cc2dComponent.Density;
+			out << YAML::Key << "Friction" << YAML::Value << cc2dComponent.Friction;
+			out << YAML::Key << "Restitution" << YAML::Value << cc2dComponent.Restitution;
+			out << YAML::Key << "RestitutionThreshold" << YAML::Value << cc2dComponent.RestitutionThreshold;
+
+			out << YAML::EndMap; // CircleCollider2DComponent
+		}
+
 		out << YAML::EndMap; // Entity
 	}
 
@@ -364,6 +380,19 @@ namespace Hazel {
 					bc2d.Friction = bc2dComponent["Friction"].as<float>();
 					bc2d.Restitution = bc2dComponent["Restitution"].as<float>();
 					bc2d.RestitutionThreshold = bc2dComponent["RestitutionThreshold"].as<float>();
+
+				}
+
+				auto cc2dComponent = entity["CircleCollider2DComponent"];
+				if (cc2dComponent)
+				{
+					auto& cc2d = deserializedEntity.AddComponent<CircleCollider2DComponent>();
+					cc2d.Offset = cc2dComponent["Offset"].as<glm::vec2>();
+					cc2d.Radius = cc2dComponent["Radius"].as<float>();
+					cc2d.Density = cc2dComponent["Density"].as<float>();
+					cc2d.Friction = cc2dComponent["Friction"].as<float>();
+					cc2d.Restitution = cc2dComponent["Restitution"].as<float>();
+					cc2d.RestitutionThreshold = cc2dComponent["RestitutionThreshold"].as<float>();
 
 				}
 			}
