@@ -119,7 +119,7 @@ project "Sandbox"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
-    staticruntime "on"
+    staticruntime "off"
     
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -135,7 +135,8 @@ project "Sandbox"
         "ChernoHazel/vendor/spdlog/include",
         "ChernoHazel/src",
         "ChernoHazel/vendor",
-        "%{IncludeDir.glm}"
+        "%{IncludeDir.glm}",
+        "%{IncludeDir.entt}"
     }
     
     links
@@ -210,4 +211,5 @@ project "Hazelnut"
         defines "HZ_DIST"
         runtime "Release"
         optimize "on"
+		
         

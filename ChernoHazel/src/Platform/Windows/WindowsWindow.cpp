@@ -95,19 +95,19 @@ namespace Hazel {
 			{
 			case GLFW_PRESS:
 			{
-				KeyPressedEvent event(static_cast<KeyCode>(key), 0);
+				KeyPressedEvent event(key);
 				data.EventCallback(event);
 				break;
 			}
 			case GLFW_RELEASE:
 			{
-				KeyReleasedEvent event(static_cast<KeyCode>(key));
+				KeyReleasedEvent event(key);
 				data.EventCallback(event);
 				break;
 			}
 			case GLFW_REPEAT:
 			{
-				KeyPressedEvent event(static_cast<KeyCode>(key), 1);
+				KeyPressedEvent event(key, true);
 				data.EventCallback(event);
 				break;
 			}

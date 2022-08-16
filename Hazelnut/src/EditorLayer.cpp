@@ -446,28 +446,28 @@ namespace Hazel {
     bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
     {
         // Shortcuts
-        if (e.GetRepeatCount() > 0)
+        if (e.GetIsRepeat())
             return false;
 
         bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
         bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
         switch (e.GetKeyCode())
         {
-            case KeyCode::N:
+            case Key::N:
             {
                 if (control)
                     NewScene();
 
                 break;
             }
-            case KeyCode::O:
+            case Key::O:
             {
                 if (control)
                     OpenScene();
 
                 break;
             }
-            case KeyCode::S:
+            case Key::S:
             {
                 if (control)
                 {
@@ -482,7 +482,7 @@ namespace Hazel {
 
 
             // Scene Commands
-            case KeyCode::D:
+            case Key::D:
             {
                 if (control)
                     OnDuplicateEntity();
@@ -491,25 +491,25 @@ namespace Hazel {
             }
 
             //Gizmos
-            case KeyCode::Q:
+            case Key::Q:
             {
                 if (!m_GizmoManipulation)
                     m_GizmoType = -1;
                 break;
             }
-            case KeyCode::W:
+            case Key::W:
             {
                 if (!m_GizmoManipulation)
                     m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
                 break;
             }
-            case KeyCode::E:
+            case Key::E:
             {
                 if (!m_GizmoManipulation)
                     m_GizmoType = ImGuizmo::OPERATION::ROTATE;
                 break;
             }
-            case KeyCode::R:
+            case Key::R:
             {
                 if (!m_GizmoManipulation)
                     m_GizmoType = ImGuizmo::OPERATION::SCALE;
