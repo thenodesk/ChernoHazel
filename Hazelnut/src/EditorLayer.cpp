@@ -248,6 +248,9 @@ namespace Hazel {
                 if (ImGui::MenuItem("Open...", "Ctrl+O"))
                     OpenScene();
 
+                if (ImGui::MenuItem("Save", "Ctrl+S"))
+                    SaveScene();
+
                 if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
                     SaveSceneAs();
 
@@ -436,7 +439,9 @@ namespace Hazel {
     void EditorLayer::OnEvent(Event& e)
     {
         m_CameraController.OnEvent(e);
-        m_EditorCamera.OnEvent(e);
+
+        if (m_SceneState == SceneState::Edit)
+            m_EditorCamera.OnEvent(e);
 
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<KeyPressedEvent>(HZ_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
