@@ -5,129 +5,134 @@
 
 #include "Hazel/Renderer/Renderer.h"
 
-#include "Input.h"
+#include "Hazel/Core/Input.h"
 
 #include "Hazel/Utils/PlatformUtils.h"
 
 namespace Hazel {
 
-	Application* Application::s_Instance = nullptr;
+    Application* Application::s_Instance = nullptr;
 
-	Application::Application(const std::string& name, ApplicationCommandLineArgs args)
-		:m_CommandLineArgs(args)
-	{
-		HZ_PROFILE_FUNCTION();
+    Application::Application(const ApplicationSpecification& specification)
+        :m_Specification(specification)
+    {
+        HZ_PROFILE_FUNCTION();
 
-		HZ_CORE_ASSERT(!s_Instance, "Application already exists!");
-		s_Instance = this;
-		m_Window = Window::Create(WindowProps(name));
-		m_Window->SetEventCallback(HZ_BIND_EVENT_FN(Application::OnEvent));
+        HZ_CORE_ASSERT(!s_Instance, "Application already exists!");
+        s_Instance = this;
 
-		Renderer::Init();
+        // Set working directory here
+        if (!m_Specification.WorkingDirectory.empty())
+            std::filesystem::current_path(m_Specification.WorkingDirectory);
 
-		m_ImGuiLayer = new ImGuiLayer();
-		PushOverlay(m_ImGuiLayer);
-	}
-	
+        m_Window = Window::Create(WindowProps(m_Specification.Name));
+        m_Window->SetEventCallback(HZ_BIND_EVENT_FN(Application::OnEvent));
 
-	Application::~Application()
-	{
-		HZ_PROFILE_FUNCTION();
+        Renderer::Init();
 
-		Renderer::Shutdown();
-	}
+        m_ImGuiLayer = new ImGuiLayer();
+        PushOverlay(m_ImGuiLayer);
+    }
+    
 
-	void Application::PushLayer(Layer* layer)
-	{
-		HZ_PROFILE_FUNCTION();
+    Application::~Application()
+    {
+        HZ_PROFILE_FUNCTION();
 
-		m_LayerStack.PushLayer(layer);
-		layer->OnAttach();
-	}
+        Renderer::Shutdown();
+    }
 
-	void Application::PushOverlay(Layer* overlay)
-	{
-		HZ_PROFILE_FUNCTION();
+    void Application::PushLayer(Layer* layer)
+    {
+        HZ_PROFILE_FUNCTION();
 
-		m_LayerStack.PushOverlay(overlay);
-		overlay->OnAttach();
-	}
+        m_LayerStack.PushLayer(layer);
+        layer->OnAttach();
+    }
 
-	void Application::Close()
-	{
-		m_Running = false;
-	}
+    void Application::PushOverlay(Layer* overlay)
+    {
+        HZ_PROFILE_FUNCTION();
 
-	void Application::OnEvent(Event& e)
-	{
-		HZ_PROFILE_FUNCTION();
+        m_LayerStack.PushOverlay(overlay);
+        overlay->OnAttach();
+    }
 
-		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<WindowCloseEvent>(HZ_BIND_EVENT_FN(Application::OnWindowClose));
-		dispatcher.Dispatch<WindowResizeEvent>(HZ_BIND_EVENT_FN(Application::OnWindowResize));
+    void Application::Close()
+    {
+        m_Running = false;
+    }
 
-		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
-		{
-			(*--it)->OnEvent(e);
-			if (e.Handled)
-				break;
-		}
-	}
+    void Application::OnEvent(Event& e)
+    {
+        HZ_PROFILE_FUNCTION();
 
-	void Application::Run()
-	{
-		HZ_PROFILE_FUNCTION();
+        EventDispatcher dispatcher(e);
+        dispatcher.Dispatch<WindowCloseEvent>(HZ_BIND_EVENT_FN(Application::OnWindowClose));
+        dispatcher.Dispatch<WindowResizeEvent>(HZ_BIND_EVENT_FN(Application::OnWindowResize));
 
-		while (m_Running)
-		{
-			HZ_PROFILE_SCOPE("RunLoop");
+        for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
+        {
+            (*--it)->OnEvent(e);
+            if (e.Handled)
+                break;
+        }
+    }
 
-			float time = Time::GetTime(); // Platform::GetTime
-			Timestep timestep = time - m_LastFrameTime;
-			m_LastFrameTime = time;
+    void Application::Run()
+    {
+        HZ_PROFILE_FUNCTION();
 
-			if (!m_Minimized)
-			{
-				{
-					HZ_PROFILE_SCOPE("LayerStack OnUpdate");
+        while (m_Running)
+        {
+            HZ_PROFILE_SCOPE("RunLoop");
 
-					for (Layer* layer : m_LayerStack)
-						layer->OnUpdate(timestep);
-				}
-			}
+            float time = Time::GetTime(); // Platform::GetTime
+            Timestep timestep = time - m_LastFrameTime;
+            m_LastFrameTime = time;
 
-			m_ImGuiLayer->Begin();
-			{
-				HZ_PROFILE_SCOPE("LayerStack OnImGuiRender");
+            if (!m_Minimized)
+            {
+                {
+                    HZ_PROFILE_SCOPE("LayerStack OnUpdate");
 
-				for (Layer* layer : m_LayerStack)
-					layer->OnImGuiRender();
-			}
-			m_ImGuiLayer->End();
+                    for (Layer* layer : m_LayerStack)
+                        layer->OnUpdate(timestep);
+                }
+            }
 
-			m_Window->OnUpdate();
-		}
-	}
+            m_ImGuiLayer->Begin();
+            {
+                HZ_PROFILE_SCOPE("LayerStack OnImGuiRender");
 
-	bool Application::OnWindowClose(WindowCloseEvent& e)
-	{
-		m_Running = false;
-		return true;
-	}
+                for (Layer* layer : m_LayerStack)
+                    layer->OnImGuiRender();
+            }
+            m_ImGuiLayer->End();
 
-	bool Application::OnWindowResize(WindowResizeEvent& e)
-	{
-		HZ_PROFILE_FUNCTION();
+            m_Window->OnUpdate();
+        }
+    }
 
-		if (e.GetWidth() == 0 || e.GetHeight() == 0)
-		{
-			m_Minimized = true;
-			return false;
-		}
-		m_Minimized = false;
-		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+    bool Application::OnWindowClose(WindowCloseEvent& e)
+    {
+        m_Running = false;
+        return true;
+    }
 
-		return false;
-	}
+    bool Application::OnWindowResize(WindowResizeEvent& e)
+    {
+        HZ_PROFILE_FUNCTION();
+
+        if (e.GetWidth() == 0 || e.GetHeight() == 0)
+        {
+            m_Minimized = true;
+            return false;
+        }
+        m_Minimized = false;
+        Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+
+        return false;
+    }
 
 }

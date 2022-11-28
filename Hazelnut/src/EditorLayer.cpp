@@ -39,7 +39,7 @@ namespace Hazel {
         m_EditorScene = CreateRef<Scene>();
         m_ActiveScene = m_EditorScene;
 
-        auto commandLineArgs = Application::Get().GetCommandLineArgs();
+        auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
         if (commandLineArgs.Count > 1)
         {
             auto sceneFilePath = commandLineArgs[1];
@@ -48,50 +48,7 @@ namespace Hazel {
         }
 
         m_EditorCamera = EditorCamera(45.0f, 1.778f, 0.1, 1000.0f);
-
-#if 0
-        m_SquareEntity = m_ActiveScene->CreateEntity("Green Square");
-        m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-
-        Entity redSquare = m_ActiveScene->CreateEntity("Red Square");
-        redSquare.AddComponent<SpriteRendererComponent>(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-
-        m_CameraEntity = m_ActiveScene->CreateEntity("Camera A");
-        m_CameraEntity.AddComponent<CameraComponent>();
-
-        m_SecondCamera = m_ActiveScene->CreateEntity("Camera B");
-        auto& cc = m_SecondCamera.AddComponent<CameraComponent>();
-        cc.Primary = false;
-
-        class CameraController : public ScriptableEntity
-        {
-        public:
-            void OnCreate()
-            {
-            }
-
-            void OnDestroy()
-            {
-            }
-
-            void OnUpdate(Timestep ts)
-            {
-                auto& translation = GetComponent<TransformComponent>().Translation;
-                float speed = 5.0f;
-
-                if (Input::IsKeyPressed(KeyCode::A))
-                    translation.x -= speed * ts;
-                if (Input::IsKeyPressed(KeyCode::D))
-                    translation.x += speed * ts;
-                if (Input::IsKeyPressed(KeyCode::W))
-                    translation.y += speed * ts;
-                if (Input::IsKeyPressed(KeyCode::S))
-                    translation.y -= speed * ts;
-            }
-        };
-
-        m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-#endif
+        Renderer2D::SetLineWidth(4.0f);
 
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
@@ -248,10 +205,10 @@ namespace Hazel {
                 if (ImGui::MenuItem("Open...", "Ctrl+O"))
                     OpenScene();
 
-                if (ImGui::MenuItem("Save", "Ctrl+S"))
+                if (ImGui::MenuItem("Save", "Ctrl+S", false, m_ActiveScene != nullptr))
                     SaveScene();
 
-                if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+                if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S", false, m_ActiveScene != nullptr))
                     SaveSceneAs();
 
                 if (ImGui::MenuItem("Exit")) { Application::Get().Close(); }
@@ -320,7 +277,7 @@ namespace Hazel {
             ImGui::EndDragDropTarget();
         }
 
-        // Guizmos
+        // Gizmos
         Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
         if (selectedEntity && m_GizmoType != -1 && m_SceneState == SceneState::Edit)
         {
@@ -565,9 +522,10 @@ namespace Hazel {
                     glm::vec3 translation = tc.Translation + glm::vec3(bc2d.Offset, 0.001f);
                     glm::vec3 scale = tc.Scale * glm::vec3(bc2d.Size * 2.0f, 1.0f);
 
-                    glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation) *
-                        glm::rotate(glm::mat4(1.0f), tc.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f)) *
-                        glm::scale(glm::mat4(1.0f), scale);
+                    glm::mat4 transform = glm::translate(glm::mat4(1.0f), tc.Translation)
+                        * glm::rotate(glm::mat4(1.0f), tc.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
+                        * glm::translate(glm::mat4(1.0f), glm::vec3(bc2d.Offset, 0.001f))
+                        * glm::scale(glm::mat4(1.0f), scale);
 
                     Renderer2D::DrawRect(transform, glm::vec4(0, 1, 0, 1));
                 }
@@ -591,6 +549,13 @@ namespace Hazel {
                     Renderer2D::DrawCircle(transform, glm::vec4(0, 1, 0, 1), 0.04f);
                 }
             }
+        }
+
+        // Draw selected entity outline
+        if (Entity& selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity())
+        {
+            const TransformComponent& transform = selectedEntity.GetComponent<TransformComponent>();
+            Renderer2D::DrawRect(transform.GetTransform(), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
         }
 
         Renderer2D::EndScene();
@@ -641,9 +606,7 @@ namespace Hazel {
     void EditorLayer::SaveScene()
     {
         if (!m_EditorScenePath.empty())
-        {
             SerializeScene(m_ActiveScene, m_EditorScenePath);
-        }
         else
             SaveSceneAs();
     }
