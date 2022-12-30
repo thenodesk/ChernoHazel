@@ -24,6 +24,15 @@ group "Dependencies"
 
 group ""
 
-include "ChernoHazel"
-include "Sandbox"
+group "Core"
+	include "ChernoHazel"
+	include "Hazel-ScriptCore"
+group ""
+
+group "Tools"
 include "Hazelnut"
+group ""
+
+group "Misc"
+include "Sandbox"
+group ""

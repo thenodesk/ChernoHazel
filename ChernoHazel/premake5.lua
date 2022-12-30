@@ -51,7 +51,7 @@ project "ChernoHazel"
         "ImGui",
 		"yaml-cpp",
 		"Box2D",
-        "opengl32.lib"
+        "opengl32.lib",
 		
 		"%{Library.mono}"
     }
@@ -65,6 +65,14 @@ project "ChernoHazel"
         defines
         {
         }
+		
+		links
+		{
+			"%{Library.WinSock}",
+			"%{Library.WinMM}",
+			"%{Library.WinVersion}",
+			"%{Library.BCrypt}"
+		}
         
     filter "configurations:Debug"
         defines "HZ_DEBUG"
