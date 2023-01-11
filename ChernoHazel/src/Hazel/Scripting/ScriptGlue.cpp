@@ -1,5 +1,9 @@
 #include "hzpch.h"
 #include "ScriptGlue.h"
+#include "ScriptEngine.h"
+
+#include "Hazel/Core/UUID.h"
+#include "Hazel/Scene/Scene.h"
 
 #include "mono/metadata/object.h"
 
@@ -27,6 +31,27 @@ namespace Hazel {
         HZ_CORE_WARN("Value: {0}", *parameter);
         return glm::dot(*parameter, *parameter);
     }
+    
+    static void Entity_GetTranslation(UUID entityID, glm::vec3* outTranslation)
+    {
+        Scene* scene = ScriptEngine::GetSceneContext();
+        
+        Entity entity = scene->GetEntityByUUID(entityID);
+        *outTranslation = entity.GetComponent<TransformComponent>().Translation;
+    }
+    
+    static void Entity_SetTranslation(UUID entityID, glm::vec3* translation)
+    {
+        Scene* scene = ScriptEngine::GetSceneContext();
+
+        Entity entity = scene->GetEntityByUUID(entityID);
+        entity.GetComponent<TransformComponent>().Translation = *translation;
+    }
+
+    static bool Input_IsKeyDown(KeyCode keycode)
+    {
+        return Input::IsKeyPressed(keycode);
+    }
 
     void ScriptGlue::RegisterFunctions()
     {
@@ -34,5 +59,10 @@ namespace Hazel {
         HZ_ADD_INTERNAL_CALL(NativeLog);
         HZ_ADD_INTERNAL_CALL(NativeLog_Vector);
         HZ_ADD_INTERNAL_CALL(NativeLog_VectorDot);
+        
+        HZ_ADD_INTERNAL_CALL(Entity_GetTranslation);
+        HZ_ADD_INTERNAL_CALL(Entity_SetTranslation);
+
+        HZ_ADD_INTERNAL_CALL(Input_IsKeyDown);
     }
 }

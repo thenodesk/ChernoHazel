@@ -7,8 +7,11 @@ Entities:
       Translation: [0, 1.66653037, 0]
       Rotation: [0, 0, -0.643178403]
       Scale: [0.999999881, 0.999999881, 1]
+    ScriptComponent:
+      ClassName: Sandbox.Player
     SpriteRendererComponent:
       Color: [1, 0.305309713, 0.305309713, 1]
+      TilingFactor: 1
     RigidBody2DComponent:
       BodyType: Dynamic
       FixedRotation: false
@@ -46,6 +49,7 @@ Entities:
       Scale: [15.0000057, 1, 1]
     SpriteRendererComponent:
       Color: [0.818584085, 0.341242224, 0.0253543612, 1]
+      TilingFactor: 1
     RigidBody2DComponent:
       BodyType: Static
       FixedRotation: false

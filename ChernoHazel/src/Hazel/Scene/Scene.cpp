@@ -3,6 +3,7 @@
 
 #include "Components.h"
 #include "ScriptableEntity.h"
+#include "Hazel/Scripting/ScriptEngine.h"
 #include "Hazel/Renderer/Renderer2D.h"
 
 #include <glm/glm.hpp>
@@ -137,22 +138,40 @@ namespace Hazel {
         entity.AddComponent<TransformComponent>();
         auto& tag = entity.AddComponent<TagComponent>();
         tag.Tag = name.empty() ? "Entity" : name;
+
+        m_EntityMap[uuid] = entity;
         return entity;
     }
 
     void Scene::DestroyEntity(Entity entity)
     {
+        m_EntityMap.erase(entity.GetUUID());
         m_Registry.destroy(entity);
     }
 
     void Scene::OnRuntimeStart()
     {
         OnPhysics2DStart();
+
+        // Scripting
+        {
+            ScriptEngine::OnRuntimeStart(this);
+            // Instantiate all script entities
+
+            auto view = m_Registry.view<ScriptComponent>();
+            for (auto e : view)
+            {
+                Entity entity = { e, this };
+                ScriptEngine::OnCreateEntity(entity);
+            }
+        }
     }
 
     void Scene::OnRuntimeStop()
     {
         OnPhysics2DStop();
+
+        ScriptEngine::OnRuntimeStop();
     }
 
     void Scene::OnSimulationStart()
@@ -169,6 +188,14 @@ namespace Hazel {
     {
         // Update Scripts
         {
+            // C# Entity OnUpdate
+            auto view = m_Registry.view<ScriptComponent>();
+            for (auto e : view)
+            {
+                Entity entity = { e, this };
+                ScriptEngine::OnUpdateEntity(entity, ts);
+            }
+
             m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
             {
                 // TODO: Move to Scene::OnScenePlay
@@ -181,6 +208,7 @@ namespace Hazel {
 
                 nsc.Instance->OnUpdate(ts);
             });
+
         }
 
         // Physics
@@ -320,6 +348,14 @@ namespace Hazel {
         CopyComponentIfExists<CircleCollider2DComponent>(newEntity, entity);*/
     }
 
+    Entity Scene::GetEntityByUUID(UUID uuid)
+    {
+        if (m_EntityMap.find(uuid) != m_EntityMap.end())
+            return { m_EntityMap.at(uuid), this };
+
+        return {};
+    }
+
     Entity Scene::GetPrimaryCameraEntity()
     {
         auto view = m_Registry.view<CameraComponent>();
@@ -450,6 +486,11 @@ namespace Hazel {
     void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
     {
         component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+    }
+    
+    template<>
+    void Scene::OnComponentAdded<ScriptComponent>(Entity entity, ScriptComponent& component)
+    {
     }
 
     template<>
