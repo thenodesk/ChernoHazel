@@ -235,7 +235,7 @@ namespace Hazel {
         ImGui::Text("Draw Calls: %d", stats.DrawCalls);
         ImGui::Text("Quads: %d", stats.QuadCount);
         ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
-        ImGui::Text("Indices: %d", stats.GetTotalIndexCount()); 
+        ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
 
         ImGui::End();
 
@@ -312,7 +312,7 @@ namespace Hazel {
             if (m_GizmoType == ImGuizmo::OPERATION::ROTATE)
                 snapValue = 45.0f;
 
-            float snapValues[3] = { snapValue, snapValue , snapValue };
+            float snapValues[3] = { snapValue, snapValue, snapValue };
 
             ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
                 (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
@@ -350,11 +350,11 @@ namespace Hazel {
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
         auto& colors = ImGui::GetStyle().Colors;
         const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x , buttonHovered.y, buttonHovered.z, 0.5f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
         const auto& buttonActive = colors[ImGuiCol_ButtonActive];
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
 
-        ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse);
+        ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
         bool toolbarEnabled = (bool)m_ActiveScene;
 

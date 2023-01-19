@@ -38,6 +38,7 @@ namespace Hazel {
 		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;	// Enable Gamepad Controls
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;		// Enable Docking
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;		// Enable Multi-viewport / Platform Windows
+		//io.ConfigFlags |= ImGuiConfigFlags_NavNoCaptureKeyboard;
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 

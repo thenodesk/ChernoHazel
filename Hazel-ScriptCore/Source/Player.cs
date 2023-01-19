@@ -1,19 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Hazel;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace Sandbox
 {
     public class Player : Entity
     {
+        private TransformComponent m_Transform;
+        private Rigidbody2DComponent m_RigidBody;
+
         void OnCreate()
         {
             Console.WriteLine($"Player.OnCreate - {ID}");
+
+            m_Transform = GetComponent<TransformComponent>();
+            m_RigidBody = GetComponent<Rigidbody2DComponent>();
         }
 
         void OnUpdate(float ts)
@@ -33,11 +34,14 @@ namespace Sandbox
             else if (Input.IsKeyDown(KeyCode.D))
                 velocity.X = 1.0f;
 
+
             velocity *= speed;
 
-            Vector3 translation = Translation;
-            translation += velocity * ts;
-            Translation = translation;
+            m_RigidBody.ApplyLinearImpulse(velocity.XY, true);
+
+            //Vector3 translation = m_Transform.Translation;
+            //translation += velocity * ts;
+            //m_Transform.Translation = translation;
         }
     }
 }
