@@ -18,8 +18,6 @@ namespace Sandbox
 
             m_Transform = GetComponent<TransformComponent>();
             m_RigidBody = GetComponent<Rigidbody2DComponent>();
-
-            PlayerSpeed = 0.25f;
         }
 
         void OnUpdate(float ts)
@@ -41,7 +39,7 @@ namespace Sandbox
                 velocity.X = 1.0f;
 
 
-            velocity *= speed;
+            velocity *= speed * ts;
 
             m_RigidBody.ApplyLinearImpulse(velocity.XY, true);
 
