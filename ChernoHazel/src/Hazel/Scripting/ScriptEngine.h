@@ -47,19 +47,19 @@ namespace Hazel {
         template<typename T>
         T GetValue()
         {
-            static_assert(sizeof(T) <= 8, "Type too large!");
+            static_assert(sizeof(T) <= 16, "Type too large!");
             return *(T*)m_Buffer;
         }
 
         template<typename T>
         void SetValue(const T& value)
         {
-            static_assert(sizeof(T) <= 8, "Type too large!");
+            static_assert(sizeof(T) <= 16, "Type too large!");
             memcpy(m_Buffer, &value, sizeof(T));
         }
 
     private:
-        uint8_t m_Buffer[8];
+        uint8_t m_Buffer[16];
 
         friend class ScriptEngine;
         friend class ScriptInstance;
@@ -103,7 +103,7 @@ namespace Hazel {
         template<typename T>
         T GetFieldValue(const std::string& name)
         {
-            static_assert(sizeof(T) <= 8, "Type too large!");
+            static_assert(sizeof(T) <= 16, "Type too large!");
 
             bool success = GetFieldValueInternal(name, s_FieldValueBuffer);
             if (!success)
@@ -115,7 +115,7 @@ namespace Hazel {
         template<typename T>
         void SetFieldValue(const std::string& name, T value)
         {
-            static_assert(sizeof(T) <= 8, "Type too large!");
+            static_assert(sizeof(T) <= 16, "Type too large!");
             SetFieldValueInternal(name, &value);
         }
 
@@ -131,7 +131,7 @@ namespace Hazel {
         MonoMethod* m_OnCreateMethod = nullptr;
         MonoMethod* m_OnUpdateMethod = nullptr;
 
-        inline static char s_FieldValueBuffer[8];
+        inline static char s_FieldValueBuffer[16];
 
         friend class ScriptEngine;
         friend struct ScriptFieldInstance;
@@ -172,4 +172,56 @@ namespace Hazel {
         friend class ScriptClass;
         friend class ScriptGlue;
     };
+
+    namespace Utils {
+
+        inline const char* ScriptFieldTypeToString(ScriptFieldType type)
+        {
+            switch (type)
+            {
+            case ScriptFieldType::None:   return "None";
+            case ScriptFieldType::Float:   return "Float";
+            case ScriptFieldType::Double:  return "Double";
+            case ScriptFieldType::Bool:    return "Bool";
+            case ScriptFieldType::Char:    return "Char";
+            case ScriptFieldType::Short:   return "Short";
+            case ScriptFieldType::Int:     return "Int";
+            case ScriptFieldType::Long:    return "Long";
+            case ScriptFieldType::Byte:    return "Byte";
+            case ScriptFieldType::UShort:  return "UShort";
+            case ScriptFieldType::UInt:    return "UInt";
+            case ScriptFieldType::ULong:   return "ULong";
+            case ScriptFieldType::Vector2: return "Vector2";
+            case ScriptFieldType::Vector3: return "Vector3";
+            case ScriptFieldType::Vector4: return "Vector4";
+            case ScriptFieldType::Entity:  return "Entity";
+            }
+            HZ_CORE_ASSERT(false, "Unknown ScriptFieldType");
+            return "None";
+        }
+
+        inline ScriptFieldType StringToScriptFieldType(std::string_view type)
+        {
+            
+            if (type == "None")    return ScriptFieldType::None;
+            if (type == "Float")   return ScriptFieldType::Float;
+            if (type == "Double")  return ScriptFieldType::Double;
+            if (type == "Bool")    return ScriptFieldType::Bool;
+            if (type == "Char")    return ScriptFieldType::Char;
+            if (type == "Short")   return ScriptFieldType::Short;
+            if (type == "Int")     return ScriptFieldType::Int;
+            if (type == "Long")    return ScriptFieldType::Long;
+            if (type == "Byte")    return ScriptFieldType::Byte;
+            if (type == "UShort")  return ScriptFieldType::UShort;
+            if (type == "UInt")    return ScriptFieldType::UInt;
+            if (type == "ULong")   return ScriptFieldType::ULong;
+            if (type == "Vector2") return ScriptFieldType::Vector2;
+            if (type == "Vector3") return ScriptFieldType::Vector3;
+            if (type == "Vector4") return ScriptFieldType::Vector4;
+            if (type == "Entity")  return ScriptFieldType::Entity;
+            
+            HZ_CORE_ASSERT(false, "Unknown ScriptFieldType");
+            return ScriptFieldType::None;
+        }
+    }
 }

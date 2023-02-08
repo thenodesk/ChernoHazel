@@ -324,6 +324,9 @@ namespace Hazel {
 
     void Scene::OnViewportResize(uint32_t width, uint32_t height)
     {
+        if (m_ViewportWidth == width && m_ViewportHeight == height)
+            return;
+
         m_ViewportWidth = width;
         m_ViewportHeight = height;
 
@@ -489,7 +492,8 @@ namespace Hazel {
     template<>
     void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
     {
-        component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+        if (m_ViewportWidth > 0 && m_ViewportHeight > 0)
+            component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
     }
     
     template<>

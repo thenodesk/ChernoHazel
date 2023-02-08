@@ -43,8 +43,7 @@ namespace Hazel {
         if (commandLineArgs.Count > 1)
         {
             auto sceneFilePath = commandLineArgs[1];
-            SceneSerializer serializer(m_ActiveScene);
-            serializer.Deserialize(sceneFilePath);
+            OpenScene(sceneFilePath);
         }
 
         m_EditorCamera = EditorCamera(45.0f, 1.778f, 0.1, 1000.0f);
@@ -256,7 +255,7 @@ namespace Hazel {
 
         m_ViewportFocused = ImGui::IsWindowFocused();
         m_ViewportHovered = ImGui::IsWindowHovered();
-        Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
+        Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportHovered);
 
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
         m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
@@ -593,14 +592,20 @@ namespace Hazel {
             return;
         }
 
-        m_EditorScene = CreateRef<Scene>();
-        m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-        m_SceneHierarchyPanel.SetContext(m_EditorScene);
-        m_ActiveScene = m_EditorScene;
+        Ref<Scene> newScene = CreateRef<Scene>();
+        SceneSerializer serializer(newScene);
+        if (serializer.Deserialize(path.string()))
+        {
+            m_EditorScene = newScene;
+            m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+            m_SceneHierarchyPanel.SetContext(m_EditorScene);
 
-        SceneSerializer serializer(m_ActiveScene);
-        serializer.Deserialize(path.string());
-        m_EditorScenePath = path;
+            m_ActiveScene = m_EditorScene;
+            m_EditorScenePath = path;
+        }
+        else
+            HZ_WARN("Could not load {0} - not able to deserialize file", path.filename().string());
+
     }
 
     void EditorLayer::SaveScene()

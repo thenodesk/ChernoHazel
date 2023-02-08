@@ -3,6 +3,7 @@
 
 #include "Entity.h"
 #include "Components.h"
+#include "Hazel/Scripting/ScriptEngine.h"
 
 #include <fstream>
 
@@ -78,6 +79,23 @@ namespace YAML {
             rhs.y = node[1].as<float>();
             rhs.z = node[2].as<float>();
             rhs.w = node[3].as<float>();
+            return true;
+        }
+    };
+
+    template<>
+    struct convert<Hazel::UUID>
+    {
+        static Node encode(const Hazel::UUID& uuid)
+        {
+            Node node;
+            node.push_back((uint64_t)uuid);
+            return node;
+        }
+
+        static bool decode(const Node& node, Hazel::UUID& uuid)
+        {
+            uuid = node.as<uint64_t>();
             return true;
         }
     };
@@ -196,6 +214,53 @@ namespace Hazel {
 
             auto& sc = entity.GetComponent<ScriptComponent>();
             out << YAML::Key << "ClassName" << YAML::Value << sc.ClassName;
+
+            // Fields
+            Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(sc.ClassName);
+            const auto& fields = entityClass->GetFields();
+            if (fields.size() > 0)
+            {
+                out << YAML::Key << "ScriptFields" << YAML::Value;
+                out << YAML::BeginSeq; // ScriptFields
+                auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
+                for (const auto& [name, field] : fields)
+                {
+                    if (entityFields.find(name) == entityFields.end())
+                        continue;
+
+                    // - Name: ExampleField
+                    //   Type: Int
+                    //   Data: 5
+
+                    out << YAML::BeginMap; // ScriptField
+                    out << YAML::Key << "Name" << YAML::Value << name;
+                    out << YAML::Key << "Type" << YAML::Value << Utils::ScriptFieldTypeToString(field.Type);
+
+                    out << YAML::Key << "Data" << YAML::Value;
+                    ScriptFieldInstance& scriptField = entityFields.at(name);
+                    switch (field.Type)
+                    {
+                        case ScriptFieldType::Float:   out << scriptField.GetValue<float>(); break;
+                        case ScriptFieldType::Double:  out << scriptField.GetValue<double>(); break;
+                        case ScriptFieldType::Bool:    out << scriptField.GetValue<bool>(); break;
+                        case ScriptFieldType::Char:    out << scriptField.GetValue<int8_t>(); break;
+                        case ScriptFieldType::Short:   out << scriptField.GetValue<int16_t>(); break;
+                        case ScriptFieldType::Int:     out << scriptField.GetValue<int32_t>(); break;
+                        case ScriptFieldType::Long:    out << scriptField.GetValue<int64_t>(); break;
+                        case ScriptFieldType::Byte:    out << scriptField.GetValue<uint8_t>(); break;
+                        case ScriptFieldType::UShort:  out << scriptField.GetValue<uint16_t>(); break;
+                        case ScriptFieldType::UInt:    out << scriptField.GetValue<uint32_t>(); break;
+                        case ScriptFieldType::ULong:   out << scriptField.GetValue<uint64_t>(); break;
+                        case ScriptFieldType::Vector2: out << scriptField.GetValue<glm::vec2>(); break;
+                        case ScriptFieldType::Vector3: out << scriptField.GetValue<glm::vec3>(); break;
+                        case ScriptFieldType::Vector4: out << scriptField.GetValue<glm::vec4>(); break;
+                        case ScriptFieldType::Entity:  out << scriptField.GetValue<UUID>(); break;
+
+                    }
+                    out << YAML::EndMap; // ScriptField
+                }
+                out << YAML::EndSeq; // ScriptFields
+            }
 
             out << YAML::EndMap; // ScriptComponent
         }
@@ -377,6 +442,49 @@ namespace Hazel {
                 {
                     auto& sc = deserializedEntity.AddComponent<ScriptComponent>();
                     sc.ClassName = scriptComponent["ClassName"].as<std::string>();
+                    
+                    // Fields
+                    auto& scriptFields = scriptComponent["ScriptFields"];
+                    if (scriptFields)
+                    {
+                        Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(sc.ClassName);
+                        HZ_CORE_ASSERT(entityClass);
+                        const auto& fields = entityClass->GetFields();
+                        auto& entityFields = ScriptEngine::GetScriptFieldMap(deserializedEntity);
+                        for (auto& scriptField: scriptFields)
+                        {
+                            std::string name = scriptField["Name"].as<std::string>();
+
+                            std::string typeString = scriptField["Type"].as<std::string>();
+                            ScriptFieldType type = Utils::StringToScriptFieldType(typeString);
+
+                            ScriptFieldInstance& fieldInstance = entityFields[name];
+                            HZ_CORE_ASSERT(fields.find(name) != fields.end());
+                            if (fields.find(name) == fields.end())
+                                continue;
+                            fieldInstance.Field = fields.at(name);
+
+                            switch (type)
+                            {
+                                case ScriptFieldType::Float:    fieldInstance.SetValue(scriptField["Data"].as<float>()); break;
+                                case ScriptFieldType::Double:   fieldInstance.SetValue(scriptField["Data"].as<double>()); break;
+                                case ScriptFieldType::Bool:     fieldInstance.SetValue(scriptField["Data"].as<bool>()); break;
+                                case ScriptFieldType::Char:     fieldInstance.SetValue(scriptField["Data"].as<int8_t>()); break;
+                                case ScriptFieldType::Short:    fieldInstance.SetValue(scriptField["Data"].as<int16_t>()); break;
+                                case ScriptFieldType::Int:      fieldInstance.SetValue(scriptField["Data"].as<int32_t>()); break;
+                                case ScriptFieldType::Long:     fieldInstance.SetValue(scriptField["Data"].as<int64_t>()); break;
+                                case ScriptFieldType::Byte:     fieldInstance.SetValue(scriptField["Data"].as<uint8_t>()); break;
+                                case ScriptFieldType::UShort:   fieldInstance.SetValue(scriptField["Data"].as<uint16_t>()); break;
+                                case ScriptFieldType::UInt:     fieldInstance.SetValue(scriptField["Data"].as<uint32_t>()); break;
+                                case ScriptFieldType::ULong:    fieldInstance.SetValue(scriptField["Data"].as<uint64_t>()); break;
+                                case ScriptFieldType::Vector2:  fieldInstance.SetValue(scriptField["Data"].as<glm::vec2>()); break;
+                                case ScriptFieldType::Vector3:  fieldInstance.SetValue(scriptField["Data"].as<glm::vec3>()); break;
+                                case ScriptFieldType::Vector4:  fieldInstance.SetValue(scriptField["Data"].as<glm::vec4>()); break;
+                                case ScriptFieldType::Entity:   fieldInstance.SetValue(scriptField["Data"].as<UUID>()); break;
+
+                            }
+                        }
+                    }
                 }
 
                 auto spriteRendererComponent = entity["SpriteRendererComponent"];
