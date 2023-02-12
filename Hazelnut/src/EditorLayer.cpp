@@ -64,6 +64,8 @@ namespace Hazel {
         HZ_PROFILE_FUNCTION();
 
         // Resize
+        m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+
         if (FramebufferSpecification spec = m_Framebuffer->GetSpecification();
             m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && // zero sized framebuffer is invalid
             (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
@@ -71,7 +73,6 @@ namespace Hazel {
             m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
             m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
             m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
-            m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
         }
 
         // Render
@@ -566,7 +567,6 @@ namespace Hazel {
             OnSceneStop();
 
         m_EditorScene = CreateRef<Scene>();
-        m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
         m_SceneHierarchyPanel.SetContext(m_EditorScene);
         m_ActiveScene = m_EditorScene;
         m_EditorScenePath = std::filesystem::path();
@@ -597,7 +597,6 @@ namespace Hazel {
         if (serializer.Deserialize(path.string()))
         {
             m_EditorScene = newScene;
-            m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
             m_SceneHierarchyPanel.SetContext(m_EditorScene);
 
             m_ActiveScene = m_EditorScene;

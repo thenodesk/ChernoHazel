@@ -1,23 +1,38 @@
 Scene: Untitled
 Entities:
-  - Entity: 2758272792187744069
+  - Entity: 5279668668430222997
     TagComponent:
-      Tag: Player
+      Tag: Circle
     TransformComponent:
-      Translation: [0, 1.66653037, 0]
-      Rotation: [0, 0, -0.643178403]
-      Scale: [0.999999881, 0.999999881, 1]
-    ScriptComponent:
-      ClassName: Sandbox.Player
-      ScriptFields:
-        - Name: PlayerSpeed
-          Type: Float
-          Data: 18
+      Translation: [0.895444155, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CircleRendererComponent:
+      Color: [1, 1, 1, 1]
+      Thickness: 0.349999994
+      Fade: 0.00499999989
+    RigidBody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    CircleCollider2DComponent:
+      Offset: [0, 0]
+      Radius: 0.5
+      Density: 1
+      Friction: 0.5
+      Restitution: 0.5
+      RestitutionThreshold: 0.5
+  - Entity: 7553699789808268671
+    TagComponent:
+      Tag: Floor
+    TransformComponent:
+      Translation: [0, -4, 0]
+      Rotation: [0, 0, 0]
+      Scale: [15.0000057, 1, 1]
     SpriteRendererComponent:
-      Color: [1, 0.305309713, 0.305309713, 1]
+      Color: [0.818584085, 0.341242224, 0.0253543612, 1]
       TilingFactor: 1
     RigidBody2DComponent:
-      BodyType: Dynamic
+      BodyType: Static
       FixedRotation: false
     BoxCollider2DComponent:
       Offset: [0, 0]
@@ -44,40 +59,34 @@ Entities:
         OrthographicFar: 1
       Primary: true
       FixedAspectRatio: false
-  - Entity: 7553699789808268671
+    ScriptComponent:
+      ClassName: Sandbox.Camera
+      ScriptFields:
+        - Name: DistanceFromPlayer
+          Type: Float
+          Data: 5
+  - Entity: 2758272792187744069
     TagComponent:
-      Tag: Floor
+      Tag: Player
     TransformComponent:
-      Translation: [0, -4, 0]
-      Rotation: [0, 0, 0]
-      Scale: [15.0000057, 1, 1]
+      Translation: [0, 1.66653037, 0]
+      Rotation: [0, 0, -0.643178403]
+      Scale: [0.999999881, 0.999999881, 1]
+    ScriptComponent:
+      ClassName: Sandbox.Player
+      ScriptFields:
+        - Name: PlayerSpeed
+          Type: Float
+          Data: 18
     SpriteRendererComponent:
-      Color: [0.818584085, 0.341242224, 0.0253543612, 1]
+      Color: [1, 0.305309713, 0.305309713, 1]
       TilingFactor: 1
     RigidBody2DComponent:
-      BodyType: Static
+      BodyType: Dynamic
       FixedRotation: false
     BoxCollider2DComponent:
       Offset: [0, 0]
       Size: [0.5, 0.5]
-      Density: 1
-      Friction: 0.5
-      Restitution: 0.5
-      RestitutionThreshold: 0.5
-  - Entity: 5279668668430222997
-    TagComponent:
-      Tag: Circle
-    TransformComponent:
-      Translation: [0.895444155, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    CircleRendererComponent:
-      Color: [1, 1, 1, 1]
-      Thickness: 0.349999994
-      Fade: 0.00499999989
-    CircleCollider2DComponent:
-      Offset: [0, 0]
-      Radius: 0.5
       Density: 1
       Friction: 0.5
       Restitution: 0.5

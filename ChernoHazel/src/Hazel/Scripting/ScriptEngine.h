@@ -112,6 +112,8 @@ namespace Hazel {
             return *(T*)s_FieldValueBuffer;
         }
 
+        MonoObject* GetManagedObject() const { return m_Instance; }
+
         template<typename T>
         void SetFieldValue(const std::string& name, T value)
         {

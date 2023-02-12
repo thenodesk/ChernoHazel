@@ -1,6 +1,4 @@
-﻿
-
-using System;
+﻿//using System;
 
 namespace Hazel
 {
@@ -21,6 +19,13 @@ namespace Hazel
         {
             X = x;
             Y = y;
+            Z = z;
+        }
+
+        public Vector3(Vector2 xy, float z)
+        {
+            X = xy.X;
+            Y = xy.Y;
             Z = z;
         }
 
