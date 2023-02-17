@@ -1,16 +1,16 @@
 #include "EditorLayer.h"
+#include "Hazel/Scene/SceneSerializer.h"
+#include "Hazel/Utils/PlatformUtils.h"
+#include "Hazel/Math/Math.h"
+#include "Hazel/Scripting/ScriptEngine.h"
+
 #include <imgui/imgui.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Hazel/Scene/SceneSerializer.h"
-
-#include "Hazel/Utils/PlatformUtils.h"
-
 #include <ImGuizmo.h>
 
-#include "Hazel/Math/Math.h"
 
 namespace Hazel {
 
@@ -211,7 +211,15 @@ namespace Hazel {
                 if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S", false, m_ActiveScene != nullptr))
                     SaveSceneAs();
 
-                if (ImGui::MenuItem("Exit")) { Application::Get().Close(); }
+                if (ImGui::MenuItem("Exit")) Application::Get().Close();
+
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("Scripts"))
+            {
+                if (ImGui::MenuItem("Reload Assembly", "Ctrl+R"))
+                    ScriptEngine::ReloadAssembly();
 
                 ImGui::EndMenu();
             }
@@ -473,8 +481,15 @@ namespace Hazel {
             }
             case Key::R:
             {
-                if (!m_GizmoManipulation)
-                    m_GizmoType = ImGuizmo::OPERATION::SCALE;
+                if (control)
+                {
+                    ScriptEngine::ReloadAssembly();
+                }
+                else
+                {
+                    if (!m_GizmoManipulation)
+                        m_GizmoType = ImGuizmo::OPERATION::SCALE;
+                }
                 break;
             }
         
