@@ -16,4 +16,6 @@ Intermediates/
 **.csproj.user
 
 # Directories
+ChernoHazel/vendor/VulkanSDK
 Hazelnut/assets/cache
+scripts/__pycache__

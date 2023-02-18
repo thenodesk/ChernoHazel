@@ -11,6 +11,11 @@ workspace "ChernoHazel"
         "Dist"
     }
 	
+	-- solution_items
+	-- {
+		-- ".editorconfig"
+	-- }
+	
 	flags
 	{
 		"MultiProcessorCompile"
@@ -21,6 +26,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 -- Include directories relative to root folder (solution directory)
 
 group "Dependencies"
+	-- include "vendor/bin/premake"
 	include "ChernoHazel/vendor/GLFW"
 	include "ChernoHazel/vendor/Glad"
 	include "ChernoHazel/vendor/imgui"
