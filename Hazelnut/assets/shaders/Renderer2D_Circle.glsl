@@ -31,7 +31,7 @@ void main()
 	Output.LocalPosition = a_LocalPosition;
 	Output.Color = a_Color;
 	Output.Thickness = a_Thickness;
-	Output.Fade= a_Fade;
+	Output.Fade = a_Fade;
 
 	v_EntityID = a_EntityID;
 

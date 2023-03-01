@@ -18,8 +18,9 @@ project "Hazelnut"
         "%{wks.location}/ChernoHazel/vendor/spdlog/include",
         "%{wks.location}/ChernoHazel/src",
         "%{wks.location}/ChernoHazel/vendor",
-        "%{IncludeDir.glm}",
-		"%{IncludeDir.entt}",
+        "%{IncludeDir.entt}",
+        "%{IncludeDir.filewatch}",
+		"%{IncludeDir.glm}",
 		"%{IncludeDir.ImGuizmo}"
     }
     
