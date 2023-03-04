@@ -27,6 +27,8 @@ namespace Hazel {
 
         m_CheckerboardTexture = Texture2D::Create("assets/textures/Checkerboard.png");
         m_IconPlay = Texture2D::Create("Resources/Icons/PlayButton.png");
+        m_IconPause = Texture2D::Create("Resources/Icons/PauseButton.png");
+        m_IconStep = Texture2D::Create("Resources/Icons/StepButton.png");
         m_IconSimulate = Texture2D::Create("Resources/Icons/SimulateButton.png");
         m_IconStop = Texture2D::Create("Resources/Icons/StopButton.png");
 
@@ -371,9 +373,16 @@ namespace Hazel {
             tintColor.w = 0.5f;
 
         float size = ImGui::GetWindowHeight() - 4.0f;
+        ImGui::SetCursorPosX((ImGui::GetContentRegionMax().x * 0.5f) - (size * 0.5f));
+
+        bool hasPlayButton     = m_SceneState != SceneState::Simulate;  //m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play;
+        bool hasSimulateButton = m_SceneState != SceneState::Play;      //m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate;
+        bool hasPauseButton    = m_SceneState != SceneState::Edit;
+
+        // Play/Stop
+        if (hasPlayButton)
         {
-            Ref<Texture2D> icon = m_SceneState == SceneState::Play ? m_IconStop : m_IconPlay; // : m_IconStop;
-            ImGui::SetCursorPosX((ImGui::GetContentRegionMax().x * 0.5f) - (size * 0.5f));
+            Ref<Texture2D> icon = m_SceneState == SceneState::Play ? m_IconStop : m_IconPlay;
             if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), { 0,0 }, { 1,1 }, 0, ImVec4(0,0,0,0), tintColor) && toolbarEnabled)
             {
                 if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate)
@@ -383,17 +392,48 @@ namespace Hazel {
 
             }
         }
-        ImGui::SameLine();
+        // Simulate/Stop
+        if (hasSimulateButton)
         {
-            Ref<Texture2D> icon = m_SceneState == SceneState::Simulate ? m_IconStop : m_IconSimulate; // : m_IconStop;
-            //ImGui::SetCursorPosX((ImGui::GetContentRegionMax().x * 0.5f) - (size * 0.5f));
-            if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), { 0,0 }, { 1,1 }, 0, ImVec4(0, 0, 0, 0), tintColor) && toolbarEnabled)
-            {
-                if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play)
-                    OnSceneSimulate();
-                else if (m_SceneState == SceneState::Simulate)
-                    OnSceneStop();
+            if (hasPlayButton)
+                ImGui::SameLine();
 
+            {
+                Ref<Texture2D> icon = m_SceneState == SceneState::Simulate ? m_IconStop : m_IconSimulate;
+                if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), { 0,0 }, { 1,1 }, 0, ImVec4(0, 0, 0, 0), tintColor) && toolbarEnabled)
+                {
+                    if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play)
+                        OnSceneSimulate();
+                    else if (m_SceneState == SceneState::Simulate)
+                        OnSceneStop();
+
+                }
+            }
+        }
+        // Pause/Step
+        if (hasPauseButton)
+        {
+            bool isPaused = m_ActiveScene->IsPaused();
+            ImGui::SameLine();
+            {
+                Ref<Texture2D> icon = m_IconPause;
+                if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), { 0,0 }, { 1,1 }, 0, ImVec4(0, 0, 0, 0), tintColor) && toolbarEnabled)
+                {
+                    m_ActiveScene->SetPaused(!isPaused);
+
+                }
+            }
+
+            if (isPaused)
+            {
+                ImGui::SameLine();
+                {
+                    Ref<Texture2D> icon = m_IconStep;
+                    if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), { 0,0 }, { 1,1 }, 0, ImVec4(0, 0, 0, 0), tintColor) && toolbarEnabled)
+                    {
+                        m_ActiveScene->Step();
+                    }
+                }
             }
         }
         ImGui::PopStyleVar(2);
@@ -686,6 +726,14 @@ namespace Hazel {
         m_ActiveScene = m_EditorScene;
 
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+    }
+
+    void EditorLayer::OnScenePause()
+    {
+        if (m_SceneState == SceneState::Edit)
+            return;
+
+        m_ActiveScene->SetPaused(true);
     }
 
     void EditorLayer::OnDuplicateEntity()
