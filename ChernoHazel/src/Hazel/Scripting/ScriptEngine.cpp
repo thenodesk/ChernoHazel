@@ -13,6 +13,8 @@
 #include "FileWatch.h"
 
 #include "Hazel/Core/Application.h"
+#include "Hazel/Core/Buffer.h"
+#include "Hazel/Core/FileSystem.h"
 
 namespace Hazel {
 
@@ -39,49 +41,19 @@ namespace Hazel {
 
     namespace Utils {
 
-        // TODO: move to FileSystem class
-        char* ReadBytes(const std::filesystem::path& filepath, uint32_t* outSize)
-        {
-            std::ifstream stream(filepath, std::ios::binary | std::ios::ate);
-
-            if (!stream)
-            {
-                // Failed to open the file
-                return nullptr;
-            }
-
-            std::streampos end = stream.tellg();
-            stream.seekg(0, std::ios::beg);
-            uint64_t size = end - stream.tellg();
-
-            if (size == 0)
-            {
-                // File is empty
-                return nullptr;
-            }
-
-            char* buffer = new char[size];
-            stream.read(buffer, size);
-            stream.close();
-
-            *outSize = (uint32_t)size;
-            return buffer;
-        }
-
         static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath, bool loadPDB = false)
         {
-            uint32_t fileSize = 0;
-            char* fileData = ReadBytes(assemblyPath, &fileSize);
+            ScopedBuffer fileData = FileSystem::ReadFileBinary(assemblyPath);
 
             // NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the asset
             MonoImageOpenStatus status;
-            MonoImage* image = mono_image_open_from_data_full(fileData, fileSize, 1, &status, 0);
+            MonoImage* image = mono_image_open_from_data_full(fileData.As<char>(), fileData.Size(), 1, &status, 0);
 
             if (status != MONO_IMAGE_OK)
             {
                 const char* errorMessage = mono_image_strerror(status);
                 // Log some error message using the errorMessage data
-                delete[] fileData;
+                //fileData.Release();
                 return nullptr;
             }
 
@@ -92,12 +64,9 @@ namespace Hazel {
 
                 if (std::filesystem::exists(pdbPath))
                 {
-                    uint32_t pdbFileSize = 0;
-                    char* pdbFileData = ReadBytes(pdbPath, &pdbFileSize);
-                    mono_debug_open_image_from_memory(image, (const mono_byte*)pdbFileData, pdbFileSize);
+                    ScopedBuffer pdbFileData = FileSystem::ReadFileBinary(pdbPath);
+                    mono_debug_open_image_from_memory(image, pdbFileData.As<const mono_byte>(), pdbFileData.Size());
                     HZ_CORE_INFO("Loaded PDB {}", pdbPath);
-
-                    delete[] pdbFileData;
                 }
             }
 
@@ -106,9 +75,7 @@ namespace Hazel {
             mono_image_close(image);
 
             // Don't forget to free the file data
-            delete[] fileData;
-
-            
+            //delete[] fileData;
 
             return assembly;
         }
@@ -204,8 +171,20 @@ namespace Hazel {
         InitMono();
         ScriptGlue::RegisterFunctions();
 
-        LoadAssembly("Resources/Scripts/Hazel-ScriptCore.dll");
-        LoadAppAssembly("Sandboxproject/Assets/Scripts/Binaries/Sandbox.dll");
+        bool status = LoadAssembly("Resources/Scripts/Hazel-ScriptCore.dll");
+        if (!status)
+        {
+            HZ_CORE_ERROR("[ScriptEngine] Could not load Hazel-ScriptCore assembly!");
+            return;
+        }
+
+        status = LoadAppAssembly("Sandboxproject/Assets/Scripts/Binaries/Sandbox.dll");
+        if (!status)
+        {
+            HZ_CORE_ERROR("[ScriptEngine] Could not load app assembly!");
+            return;
+        }
+
         LoadAssemblyClasses();
 
         ScriptGlue::RegisterComponents();
@@ -291,30 +270,38 @@ namespace Hazel {
         s_Data->RootDomain = nullptr;
     }
 
-    void ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
+    bool ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
     {
         // Create an App Domain
         s_Data->AppDomain = mono_domain_create_appdomain("HazelScriptRuntime", nullptr);
         mono_domain_set(s_Data->AppDomain, true);
 
-        // Move this maybe
         s_Data->CoreAssemblyFilepath = filepath;
         s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
+        if (s_Data->CoreAssembly == nullptr)
+            return false;
+
         s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
         //Utils::PrintAssemblyTypes(s_Data->CoreAssembly);
+
+        return true;
     }
 
-    void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
+    bool ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
     {
-        // Move this maybe
         s_Data->AppAssemblyFilepath = filepath;
         s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
+        if (s_Data->AppAssembly == nullptr)
+            return false;
+
         s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
         //Utils::PrintAssemblyTypes(s_Data->AppAssembly);
 
         if (!s_Data->AppAssemblyFileWatcher)
             s_Data->AppAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>(filepath.string(), OnAppAssemblyFileSystemEvent);
         s_Data->AssemblyReloadPending = false;
+
+        return true;
     }
 
     void ScriptEngine::ReloadAssembly()
@@ -380,9 +367,14 @@ namespace Hazel {
 
         //HZ_CORE_ASSERT(s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end());
         if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
-            return
+        {
+            s_Data->EntityInstances[entityUUID]->InvokeOnUpdate((float)ts);
+        }
+        else
+        {
+            HZ_CORE_ERROR("Could not find ScriptInstance for entity {}", entityUUID);
+        }
 
-        s_Data->EntityInstances[entityUUID]->InvokeOnUpdate((float)ts);
     }
 
     Scene* ScriptEngine::GetSceneContext()

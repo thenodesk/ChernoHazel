@@ -48,7 +48,7 @@ namespace Hazel {
             OpenScene(sceneFilePath);
         }
 
-        m_EditorCamera = EditorCamera(45.0f, 1.778f, 0.1, 1000.0f);
+        m_EditorCamera = EditorCamera(45.0f, 1.778f, 0.1f, 1000.0f);
         Renderer2D::SetLineWidth(4.0f);
 
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
@@ -271,8 +271,8 @@ namespace Hazel {
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
         m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
-        uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
-        ImGui::Image((void*)textureID, ImVec2(m_ViewportSize.x, m_ViewportSize.y), { 0, 1 }, { 1, 0 });
+        uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+        ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2(m_ViewportSize.x, m_ViewportSize.y), { 0, 1 }, { 1, 0 });
 
         if (ImGui::BeginDragDropTarget())
         {
@@ -383,7 +383,7 @@ namespace Hazel {
         if (hasPlayButton)
         {
             Ref<Texture2D> icon = m_SceneState == SceneState::Play ? m_IconStop : m_IconPlay;
-            if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), { 0,0 }, { 1,1 }, 0, ImVec4(0,0,0,0), tintColor) && toolbarEnabled)
+            if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), ImVec2(size, size), { 0,0 }, { 1,1 }, 0, ImVec4(0,0,0,0), tintColor) && toolbarEnabled)
             {
                 if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate)
                     OnScenePlay();
@@ -400,7 +400,7 @@ namespace Hazel {
 
             {
                 Ref<Texture2D> icon = m_SceneState == SceneState::Simulate ? m_IconStop : m_IconSimulate;
-                if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), { 0,0 }, { 1,1 }, 0, ImVec4(0, 0, 0, 0), tintColor) && toolbarEnabled)
+                if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), ImVec2(size, size), { 0,0 }, { 1,1 }, 0, ImVec4(0, 0, 0, 0), tintColor) && toolbarEnabled)
                 {
                     if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play)
                         OnSceneSimulate();
@@ -417,7 +417,7 @@ namespace Hazel {
             ImGui::SameLine();
             {
                 Ref<Texture2D> icon = m_IconPause;
-                if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), { 0,0 }, { 1,1 }, 0, ImVec4(0, 0, 0, 0), tintColor) && toolbarEnabled)
+                if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), ImVec2(size, size), { 0,0 }, { 1,1 }, 0, ImVec4(0, 0, 0, 0), tintColor) && toolbarEnabled)
                 {
                     m_ActiveScene->SetPaused(!isPaused);
 
@@ -429,7 +429,7 @@ namespace Hazel {
                 ImGui::SameLine();
                 {
                     Ref<Texture2D> icon = m_IconStep;
-                    if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), { 0,0 }, { 1,1 }, 0, ImVec4(0, 0, 0, 0), tintColor) && toolbarEnabled)
+                    if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), ImVec2(size, size), { 0,0 }, { 1,1 }, 0, ImVec4(0, 0, 0, 0), tintColor) && toolbarEnabled)
                     {
                         m_ActiveScene->Step();
                     }
