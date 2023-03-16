@@ -9,7 +9,7 @@ Entities:
       Scale: [3.9199996, 3.9199996, 3.9199996]
     SpriteRendererComponent:
       Color: [0.999989986, 1, 0.999989986, 1]
-      TexturePath: assets\textures\Checkerboard.png
+      TexturePath: Textures\Checkerboard.png
       TilingFactor: 4
   - Entity: 9720804390388577549
     TagComponent:
@@ -20,7 +20,7 @@ Entities:
       Scale: [1, 1, 1]
     SpriteRendererComponent:
       Color: [1, 0.999989986, 0.999989986, 1]
-      TexturePath: assets\textures\ChernoLogo.png
+      TexturePath: Textures\ChernoLogo.png
       TilingFactor: 1
   - Entity: 5766816650002078729
     TagComponent:

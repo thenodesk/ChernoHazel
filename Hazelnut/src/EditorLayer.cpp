@@ -14,8 +14,6 @@
 
 namespace Hazel {
 
-    extern const std::filesystem::path g_AssetPath;
-
     EditorLayer::EditorLayer()
         : Layer("EditorLayer"), m_CameraController(1152.0f / 648.0f)
     {
@@ -25,7 +23,7 @@ namespace Hazel {
     {
         HZ_PROFILE_FUNCTION();
 
-        m_CheckerboardTexture = Texture2D::Create("assets/textures/Checkerboard.png");
+        //m_CheckerboardTexture = Texture2D::Create("assets/textures/Checkerboard.png");
         m_IconPlay = Texture2D::Create("Resources/Icons/PlayButton.png");
         m_IconPause = Texture2D::Create("Resources/Icons/PauseButton.png");
         m_IconStep = Texture2D::Create("Resources/Icons/StepButton.png");
@@ -44,8 +42,13 @@ namespace Hazel {
         auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
         if (commandLineArgs.Count > 1)
         {
-            auto sceneFilePath = commandLineArgs[1];
-            OpenScene(sceneFilePath);
+            auto projectFilePath = commandLineArgs[1];
+            OpenProject(projectFilePath);
+        }
+        else
+        {
+            // TODO: prompt the user to select a directory
+            NewProject();
         }
 
         m_EditorCamera = EditorCamera(45.0f, 1.778f, 0.1f, 1000.0f);
@@ -230,7 +233,7 @@ namespace Hazel {
         }
 
         m_SceneHierarchyPanel.OnImGuiRender();
-        m_ContentBrowserPanel.OnImGuiRender();
+        m_ContentBrowserPanel->OnImGuiRender();
 
         // Stats
         ImGui::Begin("Stats");
@@ -281,7 +284,7 @@ namespace Hazel {
                 const wchar_t* pathWcs = (const wchar_t*)payload->Data;
                 std::filesystem::path path(pathWcs);
                 if (path.extension() == ".hazel")
-                    OpenScene(g_AssetPath / path);
+                    OpenScene(path);
             }
 
             ImGui::EndDragDropTarget();
@@ -614,6 +617,26 @@ namespace Hazel {
         }
 
         Renderer2D::EndScene();
+    }
+
+    void EditorLayer::NewProject()
+    {
+        Project::New();
+    }
+
+    void EditorLayer::OpenProject(const std::filesystem::path& path)
+    {
+        if (Project::Load(path))
+        {
+            auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene);
+            OpenScene(startScenePath);
+            m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
+        }
+    }
+
+    void EditorLayer::SaveProject()
+    {
+        //Project::SaveActive(m_EditorScenePath);
     }
 
     void EditorLayer::NewScene()

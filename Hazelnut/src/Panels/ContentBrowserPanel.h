@@ -13,6 +13,7 @@ namespace Hazel {
 
 		void OnImGuiRender();
 	private:
+		std::filesystem::path m_BaseDir;
 		std::filesystem::path m_CurrentDir;
 		Ref<Texture2D> m_DirectoryIcon, m_FileIcon;
 	};

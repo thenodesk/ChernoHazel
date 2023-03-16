@@ -4,6 +4,7 @@
 #include "Entity.h"
 #include "Components.h"
 #include "Hazel/Scripting/ScriptEngine.h"
+#include "Hazel/Project/Project.h"
 
 #include <fstream>
 
@@ -369,18 +370,14 @@ namespace Hazel {
 
     bool SceneSerializer::Deserialize(const std::string& filepath)
     {
-        std::ifstream stream(filepath);
-        std::stringstream strStream;
-        strStream << stream.rdbuf();
-
         YAML::Node data;
         try
         {
-            data = YAML::Load(strStream.str());
+            data = YAML::LoadFile(filepath);
         }
         catch (const YAML::ParserException& ex)
         {
-            HZ_CORE_ERROR("Failed to deserialize scene '{0}'\n  {1}", filepath, ex.what());
+            HZ_CORE_ERROR("Failed to deserialize .hazel file '{0}'\n  {1}", filepath, ex.what());
 
             return false;
         }
@@ -495,7 +492,14 @@ namespace Hazel {
                     src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
 
                     if (spriteRendererComponent["TexturePath"])
-                        src.Texture = Texture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
+                    {
+                        //src.Texture = Texture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
+
+                        std::string texturePath = spriteRendererComponent["TexturePath"].as<std::string>();
+                        auto path = Project::GetAssetFileSystemPath(texturePath);
+                        src.Texture = Texture2D::Create(path.string());
+
+                    }
                     
                     if (spriteRendererComponent["TilingFactor"])
                         src.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
