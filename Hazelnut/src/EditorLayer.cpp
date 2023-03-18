@@ -48,7 +48,12 @@ namespace Hazel {
         else
         {
             // TODO: prompt the user to select a directory
-            NewProject();
+            //NewProject();
+
+            // If no project is opened, close Hazelnut
+            // NOTE: this is while we don't have a new project path
+            if (!OpenProject())
+                Application::Get().Close();
         }
 
         m_EditorCamera = EditorCamera(45.0f, 1.778f, 0.1f, 1000.0f);
@@ -201,22 +206,24 @@ namespace Hazel {
         {
             if (ImGui::BeginMenu("File"))
             {
-                // Disabling fullscreen would allow the window to be moved to the front of other windows,
-                // which we can't undo at the moment without finer window depth/z control.
+                if (ImGui::MenuItem("Open Project...", "Ctrl + O"))
+                    OpenProject();
 
-                if (ImGui::MenuItem("New", "Ctrl + N"))
+                ImGui::Separator();
+
+                if (ImGui::MenuItem("New Scene", "Ctrl + N"))
                     NewScene();
 
-                if (ImGui::MenuItem("Open...", "Ctrl+O"))
-                    OpenScene();
-
-                if (ImGui::MenuItem("Save", "Ctrl+S", false, m_ActiveScene != nullptr))
+                if (ImGui::MenuItem("Save Scene", "Ctrl+S", false, m_ActiveScene != nullptr))
                     SaveScene();
 
-                if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S", false, m_ActiveScene != nullptr))
+                if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S", false, m_ActiveScene != nullptr))
                     SaveSceneAs();
 
-                if (ImGui::MenuItem("Exit")) Application::Get().Close();
+                ImGui::Separator();
+
+                if (ImGui::MenuItem("Exit"))
+                    Application::Get().Close();
 
                 ImGui::EndMenu();
             }
@@ -476,7 +483,7 @@ namespace Hazel {
             case Key::O:
             {
                 if (control)
-                    OpenScene();
+                    OpenProject();
 
                 break;
             }
@@ -622,6 +629,16 @@ namespace Hazel {
     void EditorLayer::NewProject()
     {
         Project::New();
+    }
+
+    bool EditorLayer::OpenProject()
+    {
+        std::filesystem::path filepath = FileDialogs::OpenFile("Hazel Project (*.hproj)\0*.hproj\0");
+        if (filepath.empty())
+            return false;
+
+        OpenProject(filepath);
+        return true;
     }
 
     void EditorLayer::OpenProject(const std::filesystem::path& path)
