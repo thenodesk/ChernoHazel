@@ -542,6 +542,20 @@ namespace Hazel {
                 }
                 break;
             }
+
+            case Key::Delete:
+            {
+                if (Application::Get().GetImGuiLayer()->GetActiveWidgetID() == 0)
+                {
+                    Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+                    if (selectedEntity)
+                    {
+                        m_SceneHierarchyPanel.SetSelectedEntity({});
+                        m_ActiveScene->DestroyEntity(selectedEntity);
+                    }
+                }
+                break;
+            }
         
         }
 
@@ -645,6 +659,8 @@ namespace Hazel {
     {
         if (Project::Load(path))
         {
+            ScriptEngine::Init();
+
             auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene);
             OpenScene(startScenePath);
             m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
@@ -783,7 +799,10 @@ namespace Hazel {
 
         Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
         if (selectedEntity)
-            m_EditorScene->DuplicateEntity(selectedEntity);
+        {
+            Entity newEntity = m_EditorScene->DuplicateEntity(selectedEntity);
+            m_SceneHierarchyPanel.SetSelectedEntity(newEntity);
+        }
     }
 
 }

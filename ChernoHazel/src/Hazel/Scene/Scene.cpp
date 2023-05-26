@@ -347,19 +347,14 @@ namespace Hazel {
         }
     }
 
-    void Scene::DuplicateEntity(Entity entity)
+    Entity Scene::DuplicateEntity(Entity entity)
     {
-        Entity newEntity = CreateEntity(entity.GetName());
+        // Copy name because we're going to modify component data structure
+        std::string name = entity.GetName();
+        Entity newEntity = CreateEntity(name);
         CopyComponentIfExists(AllComponents{}, newEntity, entity);
 
-        /*CopyComponentIfExists<TransformComponent>(newEntity, entity);
-        CopyComponentIfExists<SpriteRendererComponent>(newEntity, entity);
-        CopyComponentIfExists<CircleRendererComponent>(newEntity, entity);
-        CopyComponentIfExists<CameraComponent>(newEntity, entity);
-        CopyComponentIfExists<NativeScriptComponent>(newEntity, entity);
-        CopyComponentIfExists<Rigidbody2DComponent>(newEntity, entity);
-        CopyComponentIfExists<BoxCollider2DComponent>(newEntity, entity);
-        CopyComponentIfExists<CircleCollider2DComponent>(newEntity, entity);*/
+        return newEntity;
     }
 
     Entity Scene::FindEntityByName(std::string_view name)

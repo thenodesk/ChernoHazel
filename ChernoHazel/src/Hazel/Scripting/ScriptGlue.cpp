@@ -112,6 +112,18 @@ namespace Hazel {
         body->ApplyLinearImpulseToCenter(b2Vec2(impulse->x, impulse->y), wake);
     }
 
+    static void Rigidbody2DComponent_GetLinearVelocity(UUID entityID, glm::vec2* outLinearVelocity)
+    {
+        Scene* scene = ScriptEngine::GetSceneContext();
+        HZ_CORE_ASSERT(scene);
+        Entity entity = scene->GetEntityByUUID(entityID);
+        HZ_CORE_ASSERT(entity);
+
+        b2Body* body = (b2Body*)entity.GetComponent<Rigidbody2DComponent>().RuntimeBody;
+        const b2Vec2& linearVelocity = body->GetLinearVelocity();
+        *outLinearVelocity = glm::vec2(linearVelocity.x, linearVelocity.y);
+    }
+
     static bool Input_IsKeyDown(KeyCode keycode)
     {
         return Input::IsKeyPressed(keycode);
@@ -167,6 +179,7 @@ namespace Hazel {
 
         HZ_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulse);
         HZ_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);
+        HZ_ADD_INTERNAL_CALL(Rigidbody2DComponent_GetLinearVelocity);
 
         HZ_ADD_INTERNAL_CALL(Input_IsKeyDown);
     }

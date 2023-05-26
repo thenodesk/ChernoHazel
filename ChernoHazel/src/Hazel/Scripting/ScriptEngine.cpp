@@ -15,6 +15,7 @@
 #include "Hazel/Core/Application.h"
 #include "Hazel/Core/Buffer.h"
 #include "Hazel/Core/FileSystem.h"
+#include "Hazel/Project/Project.h"
 
 namespace Hazel {
 
@@ -182,7 +183,8 @@ namespace Hazel {
             return;
         }
 
-        status = LoadAppAssembly("Sandboxproject/Assets/Scripts/Binaries/Sandbox.dll");
+        auto scriptModulePath = Project::GetAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath;
+        status = LoadAppAssembly(scriptModulePath);
         if (!status)
         {
             HZ_CORE_ERROR("[ScriptEngine] Could not load app assembly!");
