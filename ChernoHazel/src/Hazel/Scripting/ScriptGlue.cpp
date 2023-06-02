@@ -4,6 +4,7 @@
 
 #include "Hazel/Core/UUID.h"
 #include "Hazel/Scene/Scene.h"
+#include "Hazel/Physics/Physics2D.h"
 
 #include "mono/metadata/object.h"
 #include "mono/metadata/reflection.h"
@@ -124,6 +125,28 @@ namespace Hazel {
         *outLinearVelocity = glm::vec2(linearVelocity.x, linearVelocity.y);
     }
 
+    static Rigidbody2DComponent::BodyType Rigidbody2DComponent_GetType(UUID entityID)
+    {
+        Scene* scene = ScriptEngine::GetSceneContext();
+        HZ_CORE_ASSERT(scene);
+        Entity entity = scene->GetEntityByUUID(entityID);
+        HZ_CORE_ASSERT(entity);
+
+        b2Body* body = (b2Body*)entity.GetComponent<Rigidbody2DComponent>().RuntimeBody;
+        return Utils::Rigidbody2DTypeFromBox2DBody(body->GetType());
+    }
+
+    static void Rigidbody2DComponent_SetType(UUID entityID, Rigidbody2DComponent::BodyType bodyType)
+    {
+        Scene* scene = ScriptEngine::GetSceneContext();
+        HZ_CORE_ASSERT(scene);
+        Entity entity = scene->GetEntityByUUID(entityID);
+        HZ_CORE_ASSERT(entity);
+
+        b2Body* body = (b2Body*)entity.GetComponent<Rigidbody2DComponent>().RuntimeBody;
+        body->SetType(Utils::Rigidbody2DTypeToBox2DBody(bodyType));
+    }
+
     static bool Input_IsKeyDown(KeyCode keycode)
     {
         return Input::IsKeyPressed(keycode);
@@ -180,6 +203,8 @@ namespace Hazel {
         HZ_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulse);
         HZ_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);
         HZ_ADD_INTERNAL_CALL(Rigidbody2DComponent_GetLinearVelocity);
+        HZ_ADD_INTERNAL_CALL(Rigidbody2DComponent_GetType);
+        HZ_ADD_INTERNAL_CALL(Rigidbody2DComponent_SetType);
 
         HZ_ADD_INTERNAL_CALL(Input_IsKeyDown);
     }

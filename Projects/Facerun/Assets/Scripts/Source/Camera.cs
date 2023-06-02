@@ -26,7 +26,7 @@ namespace Sandbox
 
             Vector2 playerVelocity = m_Player.GetComponent<Rigidbody2DComponent>().LinearVelocity;
             float target = DistanceFromPlayer + playerVelocity.Length();
-            distanceFromPlayer = Lerp(distanceFromPlayer, target, 4.0f * ts);
+            distanceFromPlayer = Lerp(distanceFromPlayer, target, 1.0f * ts);
 
             Translation = new Vector3(m_Player.Translation.XY, distanceFromPlayer);
 

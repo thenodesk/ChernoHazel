@@ -5,6 +5,7 @@
 #include "ScriptableEntity.h"
 #include "Hazel/Scripting/ScriptEngine.h"
 #include "Hazel/Renderer/Renderer2D.h"
+#include "Hazel/Physics/Physics2D.h"
 
 #include <glm/glm.hpp>
 
@@ -18,19 +19,6 @@
 #include "box2d/b2_circle_shape.h"
 
 namespace Hazel {
-
-    static b2BodyType RigidBody2DTypeToBox2D(Rigidbody2DComponent::BodyType bodyType)
-    {
-        switch (bodyType)
-        {
-            case Rigidbody2DComponent::BodyType::Static:    return b2_staticBody;
-            case Rigidbody2DComponent::BodyType::Dynamic:   return b2_dynamicBody;
-            case Rigidbody2DComponent::BodyType::Kinematic: return b2_kinematicBody;
-        }
-
-        HZ_CORE_ASSERT(false, "Unknown body type!");
-        return b2_staticBody;
-    }
 
     Scene::Scene()
     {
@@ -406,7 +394,7 @@ namespace Hazel {
             auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
 
             b2BodyDef bodyDef;
-            bodyDef.type = RigidBody2DTypeToBox2D(rb2d.Type);
+            bodyDef.type = Utils::Rigidbody2DTypeToBox2DBody(rb2d.Type);
             bodyDef.position.Set(transform.Translation.x, transform.Translation.y);
             bodyDef.angle = transform.Rotation.z;
 

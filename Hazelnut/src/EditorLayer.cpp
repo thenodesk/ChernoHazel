@@ -157,8 +157,8 @@ namespace Hazel {
         if (opt_fullscreen)
         {
             ImGuiViewport* viewport = ImGui::GetMainViewport();
-            ImGui::SetNextWindowPos(viewport->GetWorkPos());
-            ImGui::SetNextWindowSize(viewport->GetWorkSize());
+            ImGui::SetNextWindowPos(viewport->Pos);
+            ImGui::SetNextWindowSize(viewport->Size);
             ImGui::SetNextWindowViewport(viewport->ID);
             ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
             ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
@@ -244,11 +244,12 @@ namespace Hazel {
 
         // Stats
         ImGui::Begin("Stats");
-
+#if 0
         std::string name = "None";
         if (m_HoveredEntity)
             name = m_HoveredEntity.GetComponent<TagComponent>().Tag;
         ImGui::Text("Hovered Entity: %s", name.c_str());
+#endif
 
         auto stats = Renderer2D::GetStats();
         ImGui::Text("Renderer2D Stats:");
@@ -383,7 +384,7 @@ namespace Hazel {
             tintColor.w = 0.5f;
 
         float size = ImGui::GetWindowHeight() - 4.0f;
-        ImGui::SetCursorPosX((ImGui::GetContentRegionMax().x * 0.5f) - (size * 0.5f));
+        ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
 
         bool hasPlayButton     = m_SceneState != SceneState::Simulate;  //m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play;
         bool hasSimulateButton = m_SceneState != SceneState::Play;      //m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate;
