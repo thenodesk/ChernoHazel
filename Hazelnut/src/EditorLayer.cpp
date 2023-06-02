@@ -3,6 +3,7 @@
 #include "Hazel/Utils/PlatformUtils.h"
 #include "Hazel/Math/Math.h"
 #include "Hazel/Scripting/ScriptEngine.h"
+#include "Hazel/Renderer/Font.h"
 
 #include <imgui/imgui.h>
 
@@ -17,6 +18,7 @@ namespace Hazel {
     EditorLayer::EditorLayer()
         : Layer("EditorLayer"), m_CameraController(1152.0f / 648.0f)
     {
+        Font font("assets/Fonts/opensans/OpenSans-Regular.ttf");
     }
 
     void EditorLayer::OnAttach()

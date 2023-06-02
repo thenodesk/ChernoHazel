@@ -18,6 +18,8 @@ IncludeDir["mono"] = "%{wks.location}/ChernoHazel/vendor/mono/include"
 IncludeDir["shaderc"] = "%{wks.location}/ChernoHazel/vendor/shaderc/include"
 IncludeDir["SPIRV_Cross"] = "%{wks.location}/ChernoHazel/vendor/SPIRV-Cross"
 IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
+IncludeDir["msdfgen"] = "%{wks.location}/ChernoHazel/vendor/msdf-atlas-gen/msdfgen"
+IncludeDir["msdf_atlas_gen"] = "%{wks.location}/ChernoHazel/vendor/msdf-atlas-gen/msdf-atlas-gen"
 
 LibraryDir = {}
 
