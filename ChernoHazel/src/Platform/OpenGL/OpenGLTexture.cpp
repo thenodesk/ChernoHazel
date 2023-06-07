@@ -4,13 +4,47 @@
 #include "stb_image.h"
 
 namespace Hazel {
-	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
-		: m_Width(width), m_Height(height)
+
+	namespace Utils {
+
+		static GLenum HazelImageFormatToGLFormat(ImageFormat format)
+		{
+			switch (format)
+			{
+				case ImageFormat::R8:      return GL_RED;
+				case ImageFormat::RGB8:    return GL_RGB;
+				case ImageFormat::RGBA8:   return GL_RGBA;
+				case ImageFormat::RGBA32F: return GL_RGBA;
+			}
+
+			HZ_CORE_ASSERT(false);
+			return GL_NONE;
+		}
+
+		static GLenum HazelImageFormatToGLInternalFormat(ImageFormat format)
+		{
+			switch (format)
+			{
+			case ImageFormat::R8:      return GL_R8;
+			case ImageFormat::RGB8:    return GL_RGB8;
+			case ImageFormat::RGBA8:   return GL_RGBA8;
+			case ImageFormat::RGBA32F: return GL_RGBA32F;
+			}
+
+			HZ_CORE_ASSERT(false);
+			return GL_NONE;
+		}
+	}
+
+	OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& specification)
+		: m_Specification(specification), m_Width(specification.Width), m_Height(specification.Height)
 	{
 		HZ_PROFILE_FUNCTION();
 
-		m_InternalFormat = GL_RGBA8;
-		m_DataFormat = GL_RGBA;
+		
+
+		m_InternalFormat = Utils::HazelImageFormatToGLInternalFormat(specification.Format);
+		m_DataFormat = Utils::HazelImageFormatToGLFormat(specification.Format);
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
 		glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height);

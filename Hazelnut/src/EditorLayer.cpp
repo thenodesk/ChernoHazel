@@ -15,10 +15,13 @@
 
 namespace Hazel {
 
+    static Font* s_Font;
+
     EditorLayer::EditorLayer()
         : Layer("EditorLayer"), m_CameraController(1152.0f / 648.0f)
     {
-        Font font("assets/Fonts/opensans/OpenSans-Regular.ttf");
+        //s_Font = new Font("assets/fonts/opensans/OpenSans-Regular.ttf");
+        s_Font = new Font("assets/fonts/segoesc.ttf");
     }
 
     void EditorLayer::OnAttach()
@@ -266,6 +269,8 @@ namespace Hazel {
         ImGui::Begin("Settings");
 
         ImGui::Checkbox("Show physics colliders", &m_ShowPhysicsColliders);
+
+        ImGui::Image((ImTextureID)s_Font->GetAtlasTexture()->GetRendererID(), { 512, 512 }, { 0, 1 }, { 1, 0 });
 
         ImGui::End();
 
