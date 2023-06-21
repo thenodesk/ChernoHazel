@@ -1,12 +1,13 @@
 #pragma once
 
-#include "OrthographicCamera.h"
 #include "Camera.h"
 
 #include "Texture.h"
 #include "SubTexture2D.h"
 
-#include "Hazel/Renderer/EditorCamera.h"
+#include "OrthographicCamera.h"
+#include "EditorCamera.h"
+#include "Font.h"
 
 #include "Hazel/Scene/Components.h"
 
@@ -52,6 +53,8 @@ namespace Hazel {
 
 		static void DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID);
 
+		static void DrawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const glm::vec4& color);
+
 		static float GetLineWidth();
 		static void SetLineWidth(float width);
 
@@ -67,7 +70,8 @@ namespace Hazel {
 		static void ResetStats();
 		static Statistics GetStats();
 	private:
-		static void FlushAndReset();
+		static void StartBatch();
+		static void NextBatch();
 	};
 
 }

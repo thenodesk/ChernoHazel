@@ -15,13 +15,13 @@
 
 namespace Hazel {
 
-    static Font* s_Font;
+    static Ref<Font> s_Font;
 
     EditorLayer::EditorLayer()
         : Layer("EditorLayer"), m_CameraController(1152.0f / 648.0f)
     {
-        //s_Font = new Font("assets/fonts/opensans/OpenSans-Regular.ttf");
-        s_Font = new Font("assets/fonts/segoesc.ttf");
+        s_Font = Font::GetDefault();
+        //s_Font = new Font("assets/fonts/segoesc.ttf");
     }
 
     void EditorLayer::OnAttach()
