@@ -166,6 +166,8 @@ namespace Hazel {
 
         static MonoImage* GetCoreAssemblyImage();
 
+        static MonoObject* GetManagedInstance(UUID uuid);
+
     private:
         static void InitMono();
         static void ShutdownMono();

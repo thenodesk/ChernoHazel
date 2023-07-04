@@ -12,16 +12,12 @@ namespace Sandbox
         public float PlayerSpeed;
         public float Time = 0.0f;
 
-        private Camera m_Camera;
-
         void OnCreate()
         {
             Console.WriteLine($"Player.OnCreate - {ID}");
 
             m_Transform = GetComponent<TransformComponent>();
             m_RigidBody = GetComponent<Rigidbody2DComponent>();
-
-            m_Camera = FindEntityByName("Camera").As<Camera>();
         }
 
         void OnUpdate(float ts)
@@ -41,13 +37,15 @@ namespace Sandbox
             else if (Input.IsKeyDown(KeyCode.D))
                 velocity.X = 1.0f;
 
-            if (m_Camera != null)
+            Entity cameraEntity = FindEntityByName("Camera");
+            if (cameraEntity != null)
             {
+                Camera camera = cameraEntity.As<Camera>();
 
                 if (Input.IsKeyDown(KeyCode.Q))
-                    m_Camera.DistanceFromPlayer += speed * ts;
+                    camera.DistanceFromPlayer += speed * ts;
                 else if (Input.IsKeyDown(KeyCode.E))
-                    m_Camera.DistanceFromPlayer -= speed * ts;
+                    camera.DistanceFromPlayer -= speed * ts;
             }
 
 

@@ -40,7 +40,7 @@ namespace Hazel {
     
     static MonoObject* GetScriptInstance(UUID entityID)
     {
-        return ScriptEngine::GetEntityScriptInstance(entityID)->GetManagedObject();
+        return ScriptEngine::GetManagedInstance(entityID);
     }
 
     static bool Entity_HasComponent(UUID entityID, MonoReflectionType* componentType)

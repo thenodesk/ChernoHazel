@@ -11,6 +11,7 @@ namespace Sandbox
         public float DistanceFromPlayer = 5.0f;
 
         private float distanceFromPlayer = 0.0f;
+
         private Entity m_Player;
 
         void OnCreate()

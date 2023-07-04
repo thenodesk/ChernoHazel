@@ -152,6 +152,7 @@ namespace Hazel {
             for (auto e : view)
             {
                 Entity entity = { e, this };
+                // TODO(Rodrigo): Create all entities and then invoke OnCreate
                 ScriptEngine::OnCreateEntity(entity);
             }
         }
@@ -271,6 +272,17 @@ namespace Hazel {
                     auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
 
                     Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)entity);
+                }
+            }
+
+            // Draw Text
+            {
+                auto view = m_Registry.view<TransformComponent, TextComponent>();
+                for (auto entity : view)
+                {
+                    auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
+
+                    Renderer2D::DrawString(transform.GetTransform(), text, (int)entity);
                 }
             }
 
@@ -472,28 +484,17 @@ namespace Hazel {
             }
         }
 
-        //Renderer2D::DrawString("Rodrigo", Font::GetDefault(), glm::mat4(1.0f), glm::vec4(1.0f));
-        Renderer2D::DrawString(
-            R"(void main()
+        // Draw Text
         {
-            //color = texture(u_Textures[int(v_TexIndex)], Input.TexCoord) * Input.Color;
-            vec4 texColor = Input.Color * texture(u_FontAtlas, Input.TexCoord);
+            auto view = m_Registry.view<TransformComponent, TextComponent>();
+            for (auto entity : view)
+            {
+                auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
 
+                Renderer2D::DrawString(transform.GetTransform(), text, (int)entity);
+            }
+        }
 
-            vec3 msd = texture(u_FontAtlas, Input.TexCoord).rgb;
-            float sd = median(msd.r, msd.g, msd.b);
-            float screenPxDistance = screenPxRange() * (sd - 0.5);
-            float opacity = clamp(screenPxDistance + 0.5, 0.0, 1.0);
-            if (opacity == 0.0)
-                discard;
-
-            vec4 bgColor = vec4(0.0);
-            o_Color = mix(bgColor, Input.Color, opacity);
-            if (o_Color.a == 0.0)
-                discard;
-
-            o_EntityID = v_EntityID;
-        })", Font::GetDefault(), glm::mat4(1.0f), glm::vec4(1.0f));
 
         Renderer2D::EndScene();
     }
@@ -559,6 +560,11 @@ namespace Hazel {
 
     template<>
     void Scene::OnComponentAdded<CircleCollider2DComponent>(Entity entity, CircleCollider2DComponent& component)
+    {
+    }
+
+    template<>
+    void Scene::OnComponentAdded<TextComponent>(Entity entity, TextComponent& component)
     {
     }
 
